@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-
 import javax.inject.Inject;
 
 import retrofit2.Retrofit;
@@ -22,7 +21,7 @@ public class GetUserRepoWsTest {
     Retrofit retrofit;
 
     @Test
-    public void test() {
+    public void getUserRepoWsWorks() {
         DaggerDataComponentTest.create().inject(this);
 
         retrofit.create(GetUserRepoWS.class).list("pgloaguen").test().assertNoErrors();

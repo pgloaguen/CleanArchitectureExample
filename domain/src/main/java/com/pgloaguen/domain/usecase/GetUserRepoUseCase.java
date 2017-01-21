@@ -6,15 +6,9 @@ import com.pgloaguen.domain.interactor.GetUserRepoInteractor;
 import com.pgloaguen.domain.usecase.base.BaseUseCase;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by paul on 19/01/2017.

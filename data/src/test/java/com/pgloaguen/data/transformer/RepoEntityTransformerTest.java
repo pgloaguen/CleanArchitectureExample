@@ -23,7 +23,7 @@ public class RepoEntityTransformerTest {
     Repo repo;
 
     @Test
-    public void transformAllDataFilled() {
+    public void transformRepoToRepoEntityHappyCase() {
 
         given(repo.id()).willReturn(1l);
         given(repo.name()).willReturn("toto");
@@ -37,7 +37,7 @@ public class RepoEntityTransformerTest {
     }
 
     @Test
-    public void transformDescIsNull() {
+    public void transformRepoToRepoEntityDescIsNull() {
 
         given(repo.id()).willReturn(1l);
         given(repo.name()).willReturn("toto");

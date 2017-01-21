@@ -2,28 +2,25 @@ package com.pgloaguen.domain.usecase;
 
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.interactor.GetUserRepoInteractor;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * Created by paul on 19/01/2017.
@@ -31,10 +28,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class GetUserRepoTest {
 
-    @Mock
-    GetUserRepoInteractor interactor;
-    @Mock Consumer<List<RepoEntity>> consumerSuccess;
-    @Mock Consumer<? super Throwable> consumerError;
+    @Mock GetUserRepoInteractor interactor;
 
     private GetUserRepoUseCase userRepo;
 
@@ -45,11 +39,13 @@ public class GetUserRepoTest {
 
 
     @Test
-    public void execute() throws Exception {
+    public void getUserRepoUseCaseHappyCase() throws Exception {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(interactor.listUserRepo(anyString())).willReturn(Observable.just(values));
 
-        userRepo.execute("").test().assertValue(new Predicate<List<RepoEntity>>() {
+        TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
+        testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
+        testObserver.assertValue(new Predicate<List<RepoEntity>>() {
             @Override
             public boolean test(List<RepoEntity> repoEntities) throws Exception {
                 return !repoEntities.isEmpty();
@@ -58,10 +54,12 @@ public class GetUserRepoTest {
     }
 
     @Test
-    public void executeFailed() throws Exception {
+    public void getUserRepoUseCaseExceptionThrown() throws Exception {
         given(interactor.listUserRepo(anyString())).willReturn(Observable.<List<RepoEntity>>error(new NullPointerException("null")));
 
-        userRepo.execute("").test().assertError(NullPointerException.class).assertNoValues();
+        TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
+        testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
+        testObserver.assertError(NullPointerException.class).assertNoValues();
     }
 
 }

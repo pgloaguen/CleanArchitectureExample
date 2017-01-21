@@ -48,7 +48,6 @@ public class ListRepoPresenter {
     }
 
     private void executeUseCase() {
-        compositeDisposable.dispose();
         compositeDisposable.clear();
         compositeDisposable.add(getUserRepoUseCase.execute("pgloaguen").subscribe(this::onSuccess, this::onError));
     }
