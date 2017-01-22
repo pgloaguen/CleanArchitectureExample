@@ -40,6 +40,9 @@ android {
 }
 
 dependencies {
+
+    compile project(":domain")
+
     compile okHttp
     compile okHttpLog
 
@@ -59,11 +62,10 @@ dependencies {
     apt daggerCompiler
     testApt daggerCompiler
 
-    compile project(":domain")
-
     testCompile junit
     testCompile mockito
     testApt autoValueCompiler
     testApt autoValueGsonCompiler
     compile androidAnnotations
+    testCompile junit
 }

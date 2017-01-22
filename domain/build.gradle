@@ -14,14 +14,13 @@ apply plugin: 'java'
 apply plugin: "idea"
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile rxJava
-    testCompile junit
-    testCompile mockito
-
 
     compile autoValue
     apt autoValueCompiler
+
+    testCompile junit
+    testCompile mockito
 }
 
 sourceCompatibility = "1.7"

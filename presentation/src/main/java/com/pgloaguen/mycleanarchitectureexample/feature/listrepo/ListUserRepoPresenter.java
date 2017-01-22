@@ -1,5 +1,7 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
+import android.support.annotation.NonNull;
+
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
@@ -13,22 +15,24 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by paul on 20/01/2017.
  */
 
-public class ListRepoPresenter {
+public class ListUserRepoPresenter {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private PresenterListener<ListUserRepoViewModel> listener;
     private final GetUserRepoUseCase getUserRepoUseCase;
 
-    private List<RepoEntity> data;
+    @NonNull
+    private List<RepoEntity> data = new ArrayList<>();
+    private ListUserRepoViewModel currentModel;
 
-    public ListRepoPresenter(GetUserRepoUseCase getUserRepoUseCase) {
+    public ListUserRepoPresenter(GetUserRepoUseCase getUserRepoUseCase) {
         this.getUserRepoUseCase = getUserRepoUseCase;
     }
 
     public void onCreate(PresenterListener<ListUserRepoViewModel> listener) {
         this.listener = listener;
-        data = null;
+        data.clear();
         notify(ListUserRepoViewModel.create(new ArrayList<>(), null, true));
         executeUseCase();
     }
@@ -44,7 +48,10 @@ public class ListRepoPresenter {
     }
 
     private void notify(ListUserRepoViewModel model) {
-        listener.update(model);
+        if (currentModel == null || !currentModel.equals(model)) {
+            listener.update(model);
+        }
+        currentModel = model;
     }
 
     private void executeUseCase() {
@@ -52,13 +59,14 @@ public class ListRepoPresenter {
         compositeDisposable.add(getUserRepoUseCase.execute("pgloaguen").subscribe(this::onSuccess, this::onError));
     }
 
-    private void onSuccess(List<RepoEntity> repoEntities) {
-        data = repoEntities;
-        notify(ListUserRepoViewModel.create(new ArrayList<>(data), null, false));
+    private void onSuccess(@NonNull List<RepoEntity> repoEntities) {
+        data.clear();
+        data.addAll(repoEntities);
+        notify(ListUserRepoViewModel.create(new ArrayList<>(repoEntities), null, false));
     }
 
     private void onError(Throwable throwable) {
-        data = null;
+        data.clear();
         notify(ListUserRepoViewModel.create(new ArrayList<>(), throwable, false));
     }
 }

@@ -14,7 +14,6 @@ import com.pgloaguen.mycleanarchitectureexample.CleanApplication;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.mycleanarchitectureexample.di.DaggerActivityComponent;
 
 
@@ -24,8 +23,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 import static android.view.View.GONE;
 
@@ -33,7 +30,7 @@ import static android.view.View.GONE;
 public class ListUserRepoActivity extends AppCompatActivity implements PresenterListener<ListUserRepoViewModel> {
 
     @Inject
-    ListRepoPresenter presenter;
+    ListUserRepoPresenter presenter;
 
     @BindView(R.id.swipeRefreshLayout)
     SwipeRefreshLayout swipeRefreshLayout;
