@@ -2,8 +2,8 @@ package com.pgloaguen.domain.usecase;
 
 
 import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.domain.interactor.GetUserRepoInteractor;
-import com.pgloaguen.domain.usecase.base.BaseUseCase;
+import com.pgloaguen.domain.repository.GetUserRepoRepository;
+import com.pgloaguen.domain.usecase.base.UseCase;
 
 import java.util.List;
 
@@ -14,16 +14,17 @@ import io.reactivex.Scheduler;
  * Created by paul on 19/01/2017.
  */
 
-public class GetUserRepoUseCase extends BaseUseCase<List<RepoEntity>> {
+public class GetUserRepoUseCase extends UseCase<List<RepoEntity>, String> {
 
-    private final GetUserRepoInteractor interactor;
+    private final GetUserRepoRepository repository;
 
-    public GetUserRepoUseCase(GetUserRepoInteractor interactor, Scheduler runScheduler, Scheduler postScheduler) {
+    public GetUserRepoUseCase(GetUserRepoRepository repository, Scheduler runScheduler, Scheduler postScheduler) {
         super(runScheduler, postScheduler);
-        this.interactor = interactor;
+        this.repository = repository;
     }
 
-    public Observable<List<RepoEntity>> execute(String username) {
-        return interactor.listUserRepo(username).compose(applySchedulers());
+    @Override
+    protected Observable<List<RepoEntity>> build(String param) {
+        return repository.listUserRepo(param);
     }
 }

@@ -1,7 +1,7 @@
 package com.pgloaguen.domain.usecase;
 
 import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.domain.interactor.GetUserRepoInteractor;
+import com.pgloaguen.domain.repository.GetUserRepoRepository;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,20 +28,21 @@ import static org.mockito.Mockito.mock;
 @RunWith(MockitoJUnitRunner.class)
 public class GetUserRepoTest {
 
-    @Mock GetUserRepoInteractor interactor;
+    @Mock
+    GetUserRepoRepository repository;
 
     private GetUserRepoUseCase userRepo;
 
     @Before
     public void setup() {
-        userRepo = new GetUserRepoUseCase(interactor, Schedulers.io(), Schedulers.io());
+        userRepo = new GetUserRepoUseCase(repository, Schedulers.io(), Schedulers.io());
     }
 
 
     @Test
     public void getUserRepoUseCaseHappyCase() throws Exception {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
-        given(interactor.listUserRepo(anyString())).willReturn(Observable.just(values));
+        given(repository.listUserRepo(anyString())).willReturn(Observable.just(values));
 
         TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
         testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
@@ -55,7 +56,7 @@ public class GetUserRepoTest {
 
     @Test
     public void getUserRepoUseCaseExceptionThrown() throws Exception {
-        given(interactor.listUserRepo(anyString())).willReturn(Observable.<List<RepoEntity>>error(new NullPointerException("null")));
+        given(repository.listUserRepo(anyString())).willReturn(Observable.<List<RepoEntity>>error(new NullPointerException("null")));
 
         TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
         testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);

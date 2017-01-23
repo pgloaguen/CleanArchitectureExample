@@ -11,7 +11,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {NetModule.class, InteractorModule.class})
+@Component(modules = {NetModule.class, RepositoryModule.class})
 public interface DataComponentTest extends DataComponent {
     void inject(GetUserRepoWsTest getUserRepoWsTest);
 }

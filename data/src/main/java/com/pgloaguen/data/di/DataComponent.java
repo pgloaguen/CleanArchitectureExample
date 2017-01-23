@@ -1,6 +1,6 @@
 package com.pgloaguen.data.di;
 
-import com.pgloaguen.domain.interactor.GetUserRepoInteractor;
+import com.pgloaguen.domain.repository.GetUserRepoRepository;
 
 import javax.inject.Singleton;
 
@@ -11,7 +11,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {NetModule.class, InteractorModule.class})
+@Component(modules = {NetModule.class, RepositoryModule.class})
 public interface DataComponent {
-    GetUserRepoInteractor getUserRepoInteractor();
+    GetUserRepoRepository getUserRepoRepository();
 }

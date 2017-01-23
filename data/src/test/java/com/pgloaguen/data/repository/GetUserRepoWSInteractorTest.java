@@ -1,4 +1,4 @@
-package com.pgloaguen.data.interactor;
+package com.pgloaguen.data.repository;
 
 import com.pgloaguen.data.model.Repo;
 import com.pgloaguen.data.net.GetUserRepoWS;
@@ -45,7 +45,7 @@ public class GetUserRepoWSInteractorTest {
         given(userRepoWS.list(anyString())).willReturn(Single.just(Arrays.asList(mock(Repo.class))));
         given(transformer.transform(any())).willReturn(mock(RepoEntity.class));
 
-        Observable<List<RepoEntity>> o = new GetUserRepoWSInteractor(userRepoWS, transformer).listUserRepo("");
+        Observable<List<RepoEntity>> o = new GetUserRepoWSRepository(userRepoWS, transformer).listUserRepo("");
         o.subscribe(consumer);
 
         verify(consumer).accept(anyList());

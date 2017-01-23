@@ -9,22 +9,28 @@ import io.reactivex.Scheduler;
  * Created by paul on 19/01/2017.
  */
 
-public abstract class BaseUseCase<T> {
+public abstract class UseCase<R, P> {
 
     private final Scheduler runScheduler;
     private final Scheduler postScheduler;
 
-    public BaseUseCase(Scheduler runScheduler, Scheduler postScheduler) {
+    public UseCase(Scheduler runScheduler, Scheduler postScheduler) {
         this.runScheduler = runScheduler;
         this.postScheduler = postScheduler;
     }
 
-    protected ObservableTransformer<T, T> applySchedulers() {
-        return new ObservableTransformer<T, T>() {
+    private ObservableTransformer<R, R> applySchedulers() {
+        return new ObservableTransformer<R, R>() {
             @Override
-            public ObservableSource<T> apply(Observable<T> upstream) {
+            public ObservableSource<R> apply(Observable<R> upstream) {
                 return upstream.subscribeOn(runScheduler).observeOn(postScheduler);
             }
         };
+    }
+
+    protected abstract Observable<R> build(P param);
+
+    public Observable<R> execute(P param) {
+        return build(param).compose(applySchedulers());
     }
 }

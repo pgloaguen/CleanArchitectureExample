@@ -1,6 +1,6 @@
 package com.pgloaguen.mycleanarchitectureexample.di.module;
 
-import com.pgloaguen.domain.interactor.GetUserRepoInteractor;
+import com.pgloaguen.domain.repository.GetUserRepoRepository;
 import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.mycleanarchitectureexample.di.scope.AppScope;
 
@@ -18,8 +18,8 @@ public class UseCaseModule {
 
     @AppScope
     @Provides
-    public GetUserRepoUseCase provideGetUserRepo(GetUserRepoInteractor interactor) {
-        return new GetUserRepoUseCase(interactor, Schedulers.io(), AndroidSchedulers.mainThread());
+    public GetUserRepoUseCase provideGetUserRepo(GetUserRepoRepository repository) {
+        return new GetUserRepoUseCase(repository, Schedulers.io(), AndroidSchedulers.mainThread());
     }
 
 }
