@@ -5,6 +5,7 @@ buildscript {
         }
     }
     dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.3.0'
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.9"
     }
 }
@@ -12,6 +13,12 @@ buildscript {
 apply plugin: "net.ltgt.apt"
 apply plugin: 'java'
 apply plugin: "idea"
+apply plugin: 'me.tatarka.retrolambda'
+
+retrolambda {
+    oldJdk System.getenv("JAVA7_HOME")
+    javaVersion JavaVersion.VERSION_1_7
+}
 
 dependencies {
     compile rxJava
@@ -23,5 +30,5 @@ dependencies {
     testCompile mockito
 }
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
