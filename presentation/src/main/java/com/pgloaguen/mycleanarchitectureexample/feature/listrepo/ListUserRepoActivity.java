@@ -14,10 +14,13 @@ import com.pgloaguen.mycleanarchitectureexample.CleanApplication;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.domain.entity.RepoEntity;
+import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivity;
 import com.pgloaguen.mycleanarchitectureexample.di.DaggerActivityComponent;
+import com.pgloaguen.mycleanarchitectureexample.di.module.ActivityModule;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,7 +31,7 @@ import butterknife.ButterKnife;
 import static android.view.View.GONE;
 
 
-public class ListUserRepoActivity extends AppCompatActivity implements PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> {
+public class ListUserRepoActivity extends BaseActivity implements PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> {
 
     @Inject
     ListUserRepoPresenter presenter;
@@ -45,14 +48,20 @@ public class ListUserRepoActivity extends AppCompatActivity implements Presenter
     @BindView(R.id.error)
     TextView errorTextView;
 
+    private RepoAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        DaggerActivityComponent.builder().appComponent(((CleanApplication)getApplication()).getAppComponent()).build().inject(this);
+        activityComponent().inject(this);
+
         recycler.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new RepoAdapter();
+        recycler.setAdapter(adapter);
+        adapter.setListener(presenter::onRepoClick);
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
         presenter.onCreate(this);
     }
@@ -82,12 +91,12 @@ public class ListUserRepoActivity extends AppCompatActivity implements Presenter
         swipeRefreshLayout.setRefreshing(false);
         progressBar.hide();
         errorTextView.setVisibility(GONE);
-        recycler.setAdapter(new RepoAdapter(model.datas()));
+        adapter.setData(model.datas());
     }
 
     private void displayFirstFetchLoadingScreen() {
         progressBar.show();
-        recycler.setAdapter(null);
+        adapter.setData(new ArrayList<>());
         errorTextView.setVisibility(GONE);
     }
 
@@ -95,7 +104,7 @@ public class ListUserRepoActivity extends AppCompatActivity implements Presenter
         swipeRefreshLayout.setRefreshing(false);
         progressBar.hide();
         errorTextView.setVisibility(GONE);
-        recycler.setAdapter(new RepoAdapter(model.datas()));
+        adapter.setData(model.datas());
     }
 
     private void displayErrorScreen(@NonNull RemoteDataWithRefreshingState.ErrorState model) {
@@ -103,6 +112,6 @@ public class ListUserRepoActivity extends AppCompatActivity implements Presenter
         progressBar.hide();
         errorTextView.setVisibility(View.VISIBLE);
         errorTextView.setText(model.message());
-        recycler.setAdapter(null);
+        adapter.setData(new ArrayList<>());
     }
 }

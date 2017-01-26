@@ -6,6 +6,7 @@ import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -15,22 +16,22 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by paul on 26/01/2017.
  */
 
-public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
+public abstract class RemoteDataListWithRefreshingStatePresenter<T, P> {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private final UseCase<T, P> useCase;
-    private T data = null;
+    private final UseCase<List<T>, P> usecase;
+    private final List<T> data = new ArrayList<>();
 
-    private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
-    private RemoteDataWithRefreshingState<T> currentModel;
+    private PresenterListener<RemoteDataWithRefreshingState<List<T>>> listener;
+    private RemoteDataWithRefreshingState<List<T>> currentModel;
 
-    public RemoteDataWithRefreshingStatePresenter(UseCase<T, P> useCase) {
-        this.useCase = useCase;
+    public RemoteDataListWithRefreshingStatePresenter(UseCase<List<T>, P> usecase) {
+        this.usecase = usecase;
     }
 
-    public void onCreate(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
+    public void onCreate(PresenterListener<RemoteDataWithRefreshingState<List<T>>> listener) {
         this.listener = listener;
-        data = null;
+        data.clear();
         notify(RemoteDataWithRefreshingState.loadingState());
         executeUseCase();
     }
@@ -41,13 +42,13 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     }
 
     public void askForRefresh() {
-        notify(RemoteDataWithRefreshingState.refreshingState(data));
+        notify(RemoteDataWithRefreshingState.refreshingState(new ArrayList<>(data)));
         executeUseCase();
     }
 
-    public abstract Observable<T> executeUseCase(UseCase<T, P> useCase);
+    public abstract Observable<List<T>> executeUseCase(UseCase<List<T>, P> useCase);
 
-    private void notify(RemoteDataWithRefreshingState<T> model) {
+    private void notify(RemoteDataWithRefreshingState<List<T>> model) {
         if (currentModel == null || !currentModel.equals(model)) {
             listener.update(model);
         }
@@ -56,16 +57,17 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
 
     private void executeUseCase() {
         compositeDisposable.clear();
-        compositeDisposable.add(executeUseCase(useCase).subscribe(this::onSuccess, this::onError));
+        compositeDisposable.add(executeUseCase(usecase).subscribe(this::onSuccess, this::onError));
     }
 
-    private void onSuccess(@NonNull T data) {
-        this.data = data;
-        notify(RemoteDataWithRefreshingState.displayDataState(data));
+    private void onSuccess(@NonNull List<T> repoEntities) {
+        data.clear();
+        data.addAll(repoEntities);
+        notify(RemoteDataWithRefreshingState.displayDataState(repoEntities));
     }
 
     private void onError(Throwable throwable) {
-        this.data = null;
+        data.clear();
         notify(RemoteDataWithRefreshingState.errorState(throwable.getMessage()));
     }
 }

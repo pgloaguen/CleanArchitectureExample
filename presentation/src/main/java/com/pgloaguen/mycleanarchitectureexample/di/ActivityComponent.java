@@ -1,8 +1,9 @@
 package com.pgloaguen.mycleanarchitectureexample.di;
 
-import com.pgloaguen.mycleanarchitectureexample.di.module.PresenterModule;
+import com.pgloaguen.mycleanarchitectureexample.di.module.ActivityModule;
 import com.pgloaguen.mycleanarchitectureexample.di.scope.ActivityScope;
 import com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoActivity;
+import com.pgloaguen.mycleanarchitectureexample.feature.repodetails.RepoDetailsActivity;
 
 import dagger.Component;
 
@@ -11,7 +12,8 @@ import dagger.Component;
  */
 
 @ActivityScope
-@Component(dependencies = {AppComponent.class}, modules = PresenterModule.class)
+@Component(dependencies = {AppComponent.class}, modules = ActivityModule.class)
 public interface ActivityComponent {
     void inject(ListUserRepoActivity mainActivity);
+    void inject(RepoDetailsActivity activity);
 }

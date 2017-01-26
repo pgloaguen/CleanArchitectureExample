@@ -17,10 +17,10 @@ import butterknife.ButterKnife;
 public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
 
     private List<RepoEntity> repoEntities;
+    private OnRepoClick listener;
 
-    public RepoAdapter(List<RepoEntity> repoEntities) {
-        this.repoEntities = repoEntities;
-    }
+    public RepoAdapter() {}
+
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -32,6 +32,11 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         RepoEntity repoEntity = repoEntities.get(position);
         holder.name.setText(repoEntity.name());
         holder.desc.setText(repoEntity.desc());
+        holder.itemView.setOnClickListener(__ -> {
+            if(listener != null) {
+                listener.onRepoClick(repoEntity);
+            }
+        });
     }
 
     @Override
@@ -39,6 +44,14 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         return repoEntities.size();
     }
 
+    public void setData(List<RepoEntity> repoEntities) {
+        this.repoEntities = repoEntities;
+        notifyDataSetChanged();
+    }
+
+    public void setListener(OnRepoClick listener) {
+        this.listener = listener;
+    }
 
     static class VH extends RecyclerView.ViewHolder {
 
@@ -52,5 +65,9 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public interface OnRepoClick {
+        void onRepoClick(RepoEntity repoEntity);
     }
 }

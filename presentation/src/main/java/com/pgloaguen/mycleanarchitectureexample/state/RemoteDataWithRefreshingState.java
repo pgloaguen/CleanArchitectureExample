@@ -1,8 +1,11 @@
 package com.pgloaguen.mycleanarchitectureexample.state;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
+
+import java.util.List;
 
 /**
  * Created by paul on 25/01/2017.
@@ -18,7 +21,7 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
     @AutoValue
     public abstract static class DisplayDataState<D> extends RemoteDataWithRefreshingState<D> {
-        @NonNull
+        @Nullable
         public abstract D datas();
     }
 
@@ -27,7 +30,7 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
     @AutoValue
     public abstract static class RefreshingState<D> extends RemoteDataWithRefreshingState<D>{
-        @NonNull
+        @Nullable
         public abstract D datas();
     }
 
@@ -40,11 +43,11 @@ public abstract class RemoteDataWithRefreshingState<D> {
         return new AutoValue_RemoteDataWithRefreshingState_LoadingState();
     }
 
-    public static <D>RemoteDataWithRefreshingState<D> refreshingState(@NonNull D data) {
+    public static <D>RemoteDataWithRefreshingState<D> refreshingState(D data) {
         return new AutoValue_RemoteDataWithRefreshingState_RefreshingState(data);
     }
 
-    public static <D>RemoteDataWithRefreshingState<D> displayDataState(@NonNull D data) {
+    public static <D>RemoteDataWithRefreshingState<D> displayDataState( D data) {
         return new AutoValue_RemoteDataWithRefreshingState_DisplayDataState(data);
     }
 
