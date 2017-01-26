@@ -1,8 +1,12 @@
 package com.pgloaguen.data.di;
 
-import com.pgloaguen.data.repository.GetUserRepoWSRepository;
-import com.pgloaguen.data.net.GetUserRepoWS;
+import com.pgloaguen.data.net.GetUserRepoDetailsEndpoint;
+import com.pgloaguen.data.repository.GetUserRepoDetailsRepositoryImpl;
+import com.pgloaguen.data.net.GetUserRepoEndpoint;
+import com.pgloaguen.data.repository.GetUserRepoRepositoryImpl;
+import com.pgloaguen.data.transformer.RepoDetailsEntityTransformer;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
+import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
 
 
@@ -21,7 +25,13 @@ public class RepositoryModule {
 
     @Provides
     @Singleton
-    public GetUserRepoRepository buildGetUserRepoWSInteractor(Retrofit retrofit) {
-        return new GetUserRepoWSRepository(retrofit.create(GetUserRepoWS.class), new RepoEntityTransformer());
+    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit) {
+        return new GetUserRepoRepositoryImpl(retrofit.create(GetUserRepoEndpoint.class), new RepoEntityTransformer());
+    }
+
+    @Provides
+    @Singleton
+    public GetUserRepoDetailsRepository buildGetUserRepoDetailsRepository(Retrofit retrofit) {
+        return new GetUserRepoDetailsRepositoryImpl(retrofit.create(GetUserRepoDetailsEndpoint.class), new RepoDetailsEntityTransformer());
     }
 }

@@ -1,7 +1,6 @@
 package com.pgloaguen.data.repository;
 
 
-import com.pgloaguen.data.net.GetUserRepoWS;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
@@ -14,12 +13,12 @@ import io.reactivex.Observable;
  * Created by paul on 19/01/2017.
  */
 
-public class GetUserRepoWSRepository implements GetUserRepoRepository {
+public class GetUserRepoRepositoryImpl implements GetUserRepoRepository {
 
-    private final GetUserRepoWS userRepoWS;
+    private final com.pgloaguen.data.net.GetUserRepoEndpoint userRepoWS;
     private final RepoEntityTransformer repoEntityTransformer;
 
-    public GetUserRepoWSRepository(GetUserRepoWS userRepoWS, RepoEntityTransformer repoEntityTransformer) {
+    public GetUserRepoRepositoryImpl(com.pgloaguen.data.net.GetUserRepoEndpoint userRepoWS, RepoEntityTransformer repoEntityTransformer) {
         this.userRepoWS = userRepoWS;
         this.repoEntityTransformer = repoEntityTransformer;
     }

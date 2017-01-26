@@ -1,7 +1,7 @@
 package com.pgloaguen.data.repository;
 
 import com.pgloaguen.data.model.Repo;
-import com.pgloaguen.data.net.GetUserRepoWS;
+import com.pgloaguen.data.net.GetUserRepoEndpoint;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
 import com.pgloaguen.domain.entity.RepoEntity;
 
@@ -28,10 +28,10 @@ import static org.mockito.Mockito.verify;
  * Created by paul on 19/01/2017.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class GetUserRepoWSInteractorTest {
+public class GetUserRepoEndpointTest {
 
     @Mock
-    GetUserRepoWS userRepoWS;
+    GetUserRepoEndpoint userRepoWS;
 
     @Mock
     Consumer<List<RepoEntity>> consumer;
@@ -45,7 +45,7 @@ public class GetUserRepoWSInteractorTest {
         given(userRepoWS.list(anyString())).willReturn(Single.just(Arrays.asList(mock(Repo.class))));
         given(transformer.transform(any())).willReturn(mock(RepoEntity.class));
 
-        Observable<List<RepoEntity>> o = new GetUserRepoWSRepository(userRepoWS, transformer).listUserRepo("");
+        Observable<List<RepoEntity>> o = new GetUserRepoRepositoryImpl(userRepoWS, transformer).listUserRepo("");
         o.subscribe(consumer);
 
         verify(consumer).accept(anyList());

@@ -1,8 +1,5 @@
 package com.pgloaguen.mycleanarchitectureexample.activity;
 
-import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.pgloaguen.mycleanarchitectureexample.CleanApplication;
@@ -18,7 +15,7 @@ import com.pgloaguen.mycleanarchitectureexample.di.module.ActivityModule;
 public abstract class BaseActivity extends AppCompatActivity {
 
     private AppComponent getApplicationComponent() {
-        return ((CleanApplication)getApplication()).getAppComponent();
+        return ((CleanApplication) getApplication()).getAppComponent();
     }
 
     public ActivityComponent activityComponent() {

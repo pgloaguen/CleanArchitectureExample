@@ -1,5 +1,6 @@
 package com.pgloaguen.data.di;
 
+import com.pgloaguen.data.net.GetUserRepoDetailsWsTest;
 import com.pgloaguen.data.net.GetUserRepoWsTest;
 
 import javax.inject.Singleton;
@@ -14,4 +15,5 @@ import dagger.Component;
 @Component(modules = {NetModule.class, RepositoryModule.class})
 public interface DataComponentTest extends DataComponent {
     void inject(GetUserRepoWsTest getUserRepoWsTest);
+    void inject(GetUserRepoDetailsWsTest getUserRepoDetailsWsTest);
 }

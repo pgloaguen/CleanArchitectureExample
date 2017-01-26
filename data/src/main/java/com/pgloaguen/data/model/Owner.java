@@ -1,68 +1,67 @@
 package com.pgloaguen.data.model;
 
-
 import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.Gson;
 
+@Generated("com.robohorse.robopojogenerator")
 @AutoValue
-public abstract class Owner {
+public abstract class Owner{
 
-    @SerializedName("login")
-    public abstract String login();
+	@SerializedName("gists_url")
+	public abstract String gistsUrl();
 
-    @SerializedName("id")
-    public abstract long id();
+	@SerializedName("repos_url")
+	public abstract String reposUrl();
 
-    @SerializedName("avatar_url")
-    public abstract String avatarUrl();
+	@SerializedName("following_url")
+	public abstract String followingUrl();
 
-    @SerializedName("gravatar_id")
-    public abstract String gravatarId();
+	@SerializedName("starred_url")
+	public abstract String starredUrl();
 
-    @SerializedName("url")
-    public abstract String url();
+	@SerializedName("login")
+	public abstract String login();
 
-    @SerializedName("html_url")
-    public abstract String htmlUrl();
+	@SerializedName("followers_url")
+	public abstract String followersUrl();
 
-    @SerializedName("followers_url")
-    public abstract String followersUrl();
+	@SerializedName("type")
+	public abstract String type();
 
-    @SerializedName("following_url")
-    public abstract String followingUrl();
+	@SerializedName("url")
+	public abstract String url();
 
-    @SerializedName("gists_url")
-    public abstract String gistsUrl();
+	@SerializedName("subscriptions_url")
+	public abstract String subscriptionsUrl();
 
-    @SerializedName("starred_url")
-    public abstract String starredUrl();
+	@SerializedName("received_events_url")
+	public abstract String receivedEventsUrl();
 
-    @SerializedName("subscriptions_url")
-    public abstract String subscriptionsUrl();
+	@SerializedName("avatar_url")
+	public abstract String avatarUrl();
 
-    @SerializedName("organizations_url")
-    public abstract String organizationsUrl();
+	@SerializedName("events_url")
+	public abstract String eventsUrl();
 
-    @SerializedName("repos_url")
-    public abstract String reposUrl();
+	@SerializedName("html_url")
+	public abstract String htmlUrl();
 
-    @SerializedName("events_url")
-    public abstract String eventsUrl();
+	@SerializedName("site_admin")
+	public abstract boolean siteAdmin();
 
-    @SerializedName("received_events_url")
-    public abstract String receivedEventsUrl();
+	@SerializedName("id")
+	public abstract int id();
 
-    @SerializedName("type")
-    public abstract String type();
+	@SerializedName("gravatar_id")
+	public abstract String gravatarId();
 
-    @SerializedName("site_admin")
-    public abstract boolean siteAdmin();
+	@SerializedName("organizations_url")
+	public abstract String organizationsUrl();
 
-
-    public static TypeAdapter<Owner> typeAdapter(Gson gson) {
-        return new AutoValue_Owner.GsonTypeAdapter(gson);
-    }
+	public static TypeAdapter<Owner> typeAdapter(Gson gson) {
+		return new AutoValue_Owner.GsonTypeAdapter(gson);
+	}
 }
-

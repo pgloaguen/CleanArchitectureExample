@@ -1,5 +1,6 @@
 package com.pgloaguen.data.net;
 
+
 import com.pgloaguen.data.di.DaggerDataComponentTest;
 
 import org.junit.Test;
@@ -15,7 +16,7 @@ import retrofit2.Retrofit;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class GetUserRepoWsTest {
+public class GetUserRepoDetailsWsTest {
 
     @Inject
     Retrofit retrofit;
@@ -24,7 +25,7 @@ public class GetUserRepoWsTest {
     public void getUserRepoWsWorks() {
         DaggerDataComponentTest.create().inject(this);
 
-        retrofit.create(GetUserRepoEndpoint.class).list("pgloaguen").test().assertNoErrors();
+        retrofit.create(GetUserRepoDetailsEndpoint.class).fetch("pgloaguen", "CleanArchitectureExample").test().assertNoErrors();
     }
 
 }
