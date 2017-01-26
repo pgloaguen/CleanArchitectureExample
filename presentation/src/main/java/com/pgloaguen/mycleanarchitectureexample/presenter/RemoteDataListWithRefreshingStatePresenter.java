@@ -29,15 +29,21 @@ public abstract class RemoteDataListWithRefreshingStatePresenter<T, P> {
         this.usecase = usecase;
     }
 
-    public void onCreate(PresenterListener<RemoteDataWithRefreshingState<List<T>>> listener) {
+    public void init(PresenterListener<RemoteDataWithRefreshingState<List<T>>> listener) {
         this.listener = listener;
         data.clear();
         notify(RemoteDataWithRefreshingState.loadingState());
+    }
+
+    public void onStart() {
         executeUseCase();
     }
 
-    public void onDestroy() {
+    public void onStop() {
         compositeDisposable.dispose();
+    }
+
+    public void onDestroy() {
         this.listener = null;
     }
 

@@ -40,9 +40,7 @@ ext {
 
 
     // RETROFIT
-    retrofitVersion             = '2.1.0'
     retrofitRxAdapterVersion    = '1.0.0'
-    retrofit                    = "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     retrofitRx                  = "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${retrofitRxAdapterVersion}"
 
     // GSON

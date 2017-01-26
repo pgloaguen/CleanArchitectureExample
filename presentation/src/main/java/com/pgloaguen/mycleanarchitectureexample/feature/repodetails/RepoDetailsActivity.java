@@ -42,8 +42,20 @@ public class RepoDetailsActivity extends BaseActivity implements PresenterListen
         ButterKnife.bind(this);
         activityComponent().inject(this);
 
-        presenter.init(getIntent().getStringExtra("username"), getIntent().getStringExtra("repoName"));
-        presenter.onCreate(this);
+        presenter.init(getIntent().getStringExtra(KEY_USERNAME), getIntent().getStringExtra(KEY_REPONAME));
+        presenter.init(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        presenter.onStop();
     }
 
     @Override

@@ -3,20 +3,16 @@ package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.pgloaguen.mycleanarchitectureexample.CleanApplication;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivity;
-import com.pgloaguen.mycleanarchitectureexample.di.DaggerActivityComponent;
-import com.pgloaguen.mycleanarchitectureexample.di.module.ActivityModule;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
 
@@ -63,7 +59,19 @@ public class ListUserRepoActivity extends BaseActivity implements PresenterListe
         recycler.setAdapter(adapter);
         adapter.setListener(presenter::onRepoClick);
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
-        presenter.onCreate(this);
+        presenter.init(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        presenter.onStop();
     }
 
     @Override

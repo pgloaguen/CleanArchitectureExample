@@ -14,18 +14,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.TestScheduler;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -60,7 +55,7 @@ public class ListUserRepoPresenterTest {
     @Test
     public void presenterDisplayDetailsWhenRepoClick() {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
-        presenter.onCreate(presenterListener);
+        presenter.init(presenterListener);
 
         presenter.onRepoClick(answer.get(0));
         verify(navigator).showRepoDetails("pgloaguen", answer.get(0).name());

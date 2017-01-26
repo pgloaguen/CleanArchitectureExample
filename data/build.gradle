@@ -48,7 +48,6 @@ dependencies {
 
     compile rxJava
 
-    compile retrofit
     compile retrofitRx
 
     compile gson
@@ -62,10 +61,10 @@ dependencies {
     apt daggerCompiler
     testApt daggerCompiler
 
+    compile androidAnnotations
+
     testCompile junit
     testCompile mockito
     testApt autoValueCompiler
     testApt autoValueGsonCompiler
-    compile androidAnnotations
-    testCompile junit
 }
