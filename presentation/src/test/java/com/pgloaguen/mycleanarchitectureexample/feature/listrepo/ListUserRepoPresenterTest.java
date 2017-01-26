@@ -3,6 +3,7 @@ package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
+import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.TestScheduler;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -32,7 +35,7 @@ import static org.mockito.Mockito.verify;
 public class ListUserRepoPresenterTest {
 
     @Mock
-    PresenterListener<ListUserRepoViewModel> presenterListener;
+    PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> presenterListener;
 
     @Mock
     GetUserRepoUseCase useCase;
@@ -57,8 +60,8 @@ public class ListUserRepoPresenterTest {
 
         presenter.onCreate(presenterListener);
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
     }
 
     @Test
@@ -67,8 +70,8 @@ public class ListUserRepoPresenterTest {
 
         presenter.onCreate(presenterListener);
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), errorAnswer, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(any(RemoteDataWithRefreshingState.ErrorState.class));
     }
 
     @Test
@@ -78,9 +81,9 @@ public class ListUserRepoPresenterTest {
         presenter.onCreate(presenterListener);
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, true));
-        verify(presenterListener, times(2)).update(ListUserRepoViewModel.create(answer, null, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.refreshingState(answer));
+        verify(presenterListener, times(2)).update(RemoteDataWithRefreshingState.displayDataState(answer));
     }
 
     @Test
@@ -91,11 +94,11 @@ public class ListUserRepoPresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), errorAnswer, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.refreshingState(answer));
+        verify(presenterListener, times(1)).update(any(RemoteDataWithRefreshingState.ErrorState.class));
     }
 
     @Test
@@ -106,9 +109,10 @@ public class ListUserRepoPresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(2)).update(ListUserRepoViewModel.create(Collections.emptyList(), null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), errorAnswer, false));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(any(RemoteDataWithRefreshingState.ErrorState.class));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.refreshingState(new ArrayList<>()));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
     }
 
     @Test
@@ -119,10 +123,10 @@ public class ListUserRepoPresenterTest {
         presenter.askForRefresh();
         presenter.askForRefresh();
 
-        testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+        testScheduler.advanceTimeBy(20, TimeUnit.SECONDS);
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(Collections.emptyList(), null, true));
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
     }
 
     @Test
@@ -136,6 +140,6 @@ public class ListUserRepoPresenterTest {
         presenter.onDestroy();
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
-        verify(presenterListener, times(1)).update(ListUserRepoViewModel.create(answer, null, false));
+        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
     }
 }

@@ -15,6 +15,7 @@ import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.di.DaggerActivityComponent;
+import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
 
 import java.util.List;
@@ -27,7 +28,7 @@ import butterknife.ButterKnife;
 import static android.view.View.GONE;
 
 
-public class ListUserRepoActivity extends AppCompatActivity implements PresenterListener<ListUserRepoViewModel> {
+public class ListUserRepoActivity extends AppCompatActivity implements PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> {
 
     @Inject
     ListUserRepoPresenter presenter;
@@ -63,14 +64,25 @@ public class ListUserRepoActivity extends AppCompatActivity implements Presenter
     }
 
     @Override
-    public void update(ListUserRepoViewModel viewModel) {
-        if (viewModel.isLoading() && viewModel.datas().isEmpty()) {
+    public void update(RemoteDataWithRefreshingState<List<RepoEntity>> viewModel) {
+        if (viewModel instanceof RemoteDataWithRefreshingState.LoadingState) {
             displayFirstFetchLoadingScreen();
-        } else if(viewModel.error() != null) {
-            displayErrorScreen(viewModel.error());
+        } else if(viewModel instanceof RemoteDataWithRefreshingState.ErrorState) {
+            displayErrorScreen(((RemoteDataWithRefreshingState.ErrorState) viewModel));
+        } else if (viewModel instanceof RemoteDataWithRefreshingState.DisplayDataState){
+            displayDataScreen(((RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>>) viewModel));
+        } else if (viewModel instanceof RemoteDataWithRefreshingState.RefreshingState) {
+            displayRefreshingScreen(((RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>>) viewModel));
         } else {
-            displayDataScreen(viewModel.datas());
+            throw new IllegalStateException(viewModel.getClass() + " is not an handled state");
         }
+    }
+
+    private void displayRefreshingScreen(RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>> model) {
+        swipeRefreshLayout.setRefreshing(false);
+        progressBar.hide();
+        errorTextView.setVisibility(GONE);
+        recycler.setAdapter(new RepoAdapter(model.datas()));
     }
 
     private void displayFirstFetchLoadingScreen() {
@@ -79,18 +91,18 @@ public class ListUserRepoActivity extends AppCompatActivity implements Presenter
         errorTextView.setVisibility(GONE);
     }
 
-    private void displayDataScreen(@NonNull List<RepoEntity> data) {
+    private void displayDataScreen(@NonNull RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>> model) {
         swipeRefreshLayout.setRefreshing(false);
         progressBar.hide();
         errorTextView.setVisibility(GONE);
-        recycler.setAdapter(new RepoAdapter(data));
+        recycler.setAdapter(new RepoAdapter(model.datas()));
     }
 
-    private void displayErrorScreen(@NonNull Throwable error) {
+    private void displayErrorScreen(@NonNull RemoteDataWithRefreshingState.ErrorState model) {
         swipeRefreshLayout.setRefreshing(false);
         progressBar.hide();
         errorTextView.setVisibility(View.VISIBLE);
-        errorTextView.setText(error.getMessage());
+        errorTextView.setText(model.message());
         recycler.setAdapter(null);
     }
 }
