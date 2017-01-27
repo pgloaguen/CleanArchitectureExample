@@ -22,7 +22,7 @@ public abstract class BaseActivityWithRemoteDataWithRefreshingState<S> extends B
         if (viewModel instanceof LoadingState) {
             displayFirstFetchLoadingScreen();
         } else if(viewModel instanceof LoadingWithErrorState) {
-            displayLoadingWithErrorScreen(((LoadingWithErrorState) viewModel));
+            displayLoadingWithErrorScreen(((LoadingWithErrorState<S>) viewModel));
         } else if (viewModel instanceof RefreshingState) {
             displayRefreshingScreen(((RefreshingState<S>) viewModel));
         } else if(viewModel instanceof EmptyState) {
@@ -32,7 +32,7 @@ public abstract class BaseActivityWithRemoteDataWithRefreshingState<S> extends B
         } else if(viewModel instanceof ErrorState) {
             displayErrorScreen(((ErrorState) viewModel));
         } else if(viewModel instanceof ErrorWithDisplayDataState) {
-            displayErrorWithDataScreen(((ErrorWithDisplayDataState) viewModel));
+            displayErrorWithDataScreen(((ErrorWithDisplayDataState<S>) viewModel));
         } else {
             throw new IllegalStateException(viewModel.getClass() + " is not an handled state");
         }

@@ -1,7 +1,5 @@
 package com.pgloaguen.mycleanarchitectureexample.presenter;
 
-import android.support.annotation.NonNull;
-
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
@@ -9,7 +7,14 @@ import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingSt
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.displayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.DisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.EmptyState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.RefreshingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.emptyState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorWithDisplayDataState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingState;
@@ -24,11 +29,9 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final UseCase<T, P> useCase;
-    private T data = null;
-    private String error = null;
 
     private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
-    private RemoteDataWithRefreshingState<T> currentModel;
+    private RemoteDataWithRefreshingState<T> currentState;
 
     public RemoteDataWithRefreshingStatePresenter(UseCase<T, P> useCase) {
         this.useCase = useCase;
@@ -36,12 +39,11 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
 
     public void init(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
         this.listener = listener;
-        data = null;
-        notify(loadingState());
+        notify(emptyState(null));
     }
 
     public void onStart() {
-        executeUseCase();
+        executeUseCase(currentState);
     }
 
     public void onStop() {
@@ -54,36 +56,53 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     }
 
     public void askForRefresh() {
-        if (data != null) {
-            notify(refreshingState(data));
-        } else if (error != null) {
-            notify(loadingWithErrorState(error));
-        }
-        executeUseCase();
+        executeUseCase(currentState);
     }
 
     public abstract Observable<T> executeUseCase(UseCase<T, P> useCase);
 
     private void notify(RemoteDataWithRefreshingState<T> model) {
-        if (currentModel == null || !currentModel.equals(model)) {
+        if (currentState == null || !currentState.equals(model)) {
             listener.update(model);
         }
-        currentModel = model;
+        currentState = model;
     }
 
-    private void executeUseCase() {
+    private void executeUseCase(RemoteDataWithRefreshingState<T> currentState) {
+        RemoteDataWithRefreshingState<T> loadingState = getLoadingState(currentState);
         compositeDisposable.clear();
-        compositeDisposable.add(executeUseCase(useCase).subscribe(this::onSuccess, this::onError));
+        compositeDisposable.add(
+                Observable.just(true)
+                .flatMap(__ -> executeUseCase(useCase).map(RemoteDataWithRefreshingState::displayDataState))
+                .onErrorReturn(t -> getErrorState(loadingState, t.getMessage()))
+                .startWith(loadingState)
+                .subscribe(this::notify));
     }
 
-    private void onSuccess(@NonNull T data) {
-        this.data = data;
-        this.error = null;
-        notify(displayDataState(data));
+
+    private RemoteDataWithRefreshingState<T> getLoadingState(RemoteDataWithRefreshingState<T> currentState) {
+        if (currentState == null || currentState instanceof EmptyState) {
+            return loadingState();
+        } else if(currentState instanceof DisplayDataState) {
+            return refreshingState(((DisplayDataState<T>)currentState).datas());
+        } else if(currentState instanceof ErrorWithDisplayDataState) {
+            return refreshingState(((ErrorWithDisplayDataState<T>)currentState).datas());
+        } else if(currentState instanceof ErrorState) {
+            return loadingWithErrorState(((ErrorState)currentState).error());
+        } else if(currentState instanceof LoadingState || currentState instanceof LoadingWithErrorState || currentState instanceof RefreshingState) {
+            return currentState;
+        } else {
+            throw new IllegalStateException("Impossible to get next loading state for " + currentState.toString());
+        }
     }
 
-    private void onError(Throwable throwable) {
-        this.error = throwable.getMessage();
-        notify(data == null ? errorState(error) : errorWithDisplayDataState(error, data));
+    private RemoteDataWithRefreshingState<T> getErrorState(RemoteDataWithRefreshingState<T> currentState, String error) {
+        if (currentState instanceof LoadingState || currentState instanceof LoadingWithErrorState) {
+            return errorState(error);
+        } else if(currentState instanceof RefreshingState) {
+            return errorWithDisplayDataState(error, ((RefreshingState<T>)currentState).datas());
+        } else {
+            throw new IllegalStateException("Impossible to get error state for " + currentState.toString());
+        }
     }
 }

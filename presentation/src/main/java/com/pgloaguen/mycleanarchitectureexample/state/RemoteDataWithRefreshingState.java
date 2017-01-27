@@ -69,7 +69,7 @@ public abstract class RemoteDataWithRefreshingState<D> {
         return new AutoValue_RemoteDataWithRefreshingState_DisplayDataState<D>(data);
     }
 
-    public static <D> RemoteDataWithRefreshingState<D> emptyState() {
+    public static <D> RemoteDataWithRefreshingState<D> emptyState(D data) {
         return new AutoValue_RemoteDataWithRefreshingState_EmptyState<D>();
     }
 

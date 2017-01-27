@@ -23,6 +23,8 @@ import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefre
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.RefreshingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.EmptyState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingState;
 
 /**
  * Created by paul on 26/01/2017.
@@ -71,7 +73,9 @@ public class RepoDetailsActivity extends BaseActivityWithRemoteDataWithRefreshin
 
     @Override
     public void update(RemoteDataWithRefreshingState<RepoDetailsEntity> viewModel) {
-        if (viewModel instanceof RemoteDataWithRefreshingState.LoadingState) {
+        if (viewModel instanceof EmptyState) {
+            descTextView.setText("");
+        } else if (viewModel instanceof LoadingState) {
             descTextView.setText("Loading ...");
         } else if (viewModel instanceof RefreshingState) {
             descTextView.setText("Refreshing ...");
