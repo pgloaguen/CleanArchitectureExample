@@ -1,5 +1,8 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +12,7 @@ import android.widget.TextView;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.domain.entity.RepoEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -16,7 +20,10 @@ import butterknife.ButterKnife;
 
 public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
 
-    private List<RepoEntity> repoEntities;
+    @NonNull
+    private List<RepoEntity> data = new ArrayList<>();
+
+    @Nullable
     private OnRepoClick listener;
 
     public RepoAdapter() {}
@@ -29,7 +36,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        RepoEntity repoEntity = repoEntities.get(position);
+        RepoEntity repoEntity = data.get(position);
         holder.name.setText(repoEntity.name());
         holder.desc.setText(repoEntity.desc());
         holder.itemView.setOnClickListener(__ -> {
@@ -41,12 +48,34 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
 
     @Override
     public int getItemCount() {
-        return repoEntities.size();
+        return data.size();
     }
 
-    public void setData(List<RepoEntity> repoEntities) {
-        this.repoEntities = repoEntities;
-        notifyDataSetChanged();
+    public void setData(@NonNull final List<RepoEntity> newData) {
+
+        DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return data.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return newData.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return data.get(oldItemPosition).equals(newData.get(newItemPosition));
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return data.get(oldItemPosition).equals(newData.get(newItemPosition));
+            }
+        }).dispatchUpdatesTo(this);
+
+        this.data = newData;
     }
 
     public void setListener(OnRepoClick listener) {

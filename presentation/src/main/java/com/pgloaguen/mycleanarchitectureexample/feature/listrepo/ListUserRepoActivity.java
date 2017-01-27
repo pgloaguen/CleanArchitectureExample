@@ -1,20 +1,20 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
-import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivity;
+import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivityWithRemoteDataWithRefreshingState;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
 
 
-public class ListUserRepoActivity extends BaseActivity implements PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> {
+public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshingState<List<RepoEntity>> implements PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> {
 
     @Inject
     ListUserRepoPresenter presenter;
@@ -80,46 +82,59 @@ public class ListUserRepoActivity extends BaseActivity implements PresenterListe
         presenter.onDestroy();
     }
 
-    @Override
-    public void update(RemoteDataWithRefreshingState<List<RepoEntity>> viewModel) {
-        if (viewModel instanceof RemoteDataWithRefreshingState.LoadingState) {
-            displayFirstFetchLoadingScreen();
-        } else if(viewModel instanceof RemoteDataWithRefreshingState.ErrorState) {
-            displayErrorScreen(((RemoteDataWithRefreshingState.ErrorState) viewModel));
-        } else if (viewModel instanceof RemoteDataWithRefreshingState.DisplayDataState){
-            displayDataScreen(((RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>>) viewModel));
-        } else if (viewModel instanceof RemoteDataWithRefreshingState.RefreshingState) {
-            displayRefreshingScreen(((RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>>) viewModel));
-        } else {
-            throw new IllegalStateException(viewModel.getClass() + " is not an handled state");
-        }
-    }
-
-    private void displayRefreshingScreen(RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>> model) {
+    private void hideAllProgress() {
         swipeRefreshLayout.setRefreshing(false);
         progressBar.hide();
-        errorTextView.setVisibility(GONE);
-        adapter.setData(model.datas());
     }
 
-    private void displayFirstFetchLoadingScreen() {
+    @Override
+    protected void displayFirstFetchLoadingScreen() {
         progressBar.show();
         adapter.setData(new ArrayList<>());
         errorTextView.setVisibility(GONE);
     }
 
-    private void displayDataScreen(@NonNull RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>> model) {
-        swipeRefreshLayout.setRefreshing(false);
-        progressBar.hide();
+    @Override
+    protected void displayRefreshingScreen(RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>> model) {
+        if (!swipeRefreshLayout.isRefreshing()) swipeRefreshLayout.setRefreshing(true);
         errorTextView.setVisibility(GONE);
         adapter.setData(model.datas());
     }
 
-    private void displayErrorScreen(@NonNull RemoteDataWithRefreshingState.ErrorState model) {
-        swipeRefreshLayout.setRefreshing(false);
-        progressBar.hide();
+    @Override
+    protected void displayLoadingWithErrorScreen(LoadingWithErrorState viewModel) {
+        progressBar.show();
+        adapter.setData(new ArrayList<>());
         errorTextView.setVisibility(View.VISIBLE);
-        errorTextView.setText(model.message());
+    }
+
+    @Override
+    protected void displayEmptyScreen() {
+        hideAllProgress();
+        errorTextView.setVisibility(GONE);
+        adapter.setData(new ArrayList<>());
+    }
+
+    @Override
+    protected void displayDataScreen(@NonNull RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>> model) {
+        hideAllProgress();
+        errorTextView.setVisibility(GONE);
+        adapter.setData(model.datas());
+    }
+
+    @Override
+    protected void displayErrorWithDataScreen(ErrorWithDisplayDataState<List<RepoEntity>> model) {
+        hideAllProgress();
+        errorTextView.setVisibility(GONE);
+        adapter.setData(model.datas());
+        Toast.makeText(this, model.error(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void displayErrorScreen(@NonNull RemoteDataWithRefreshingState.ErrorState model) {
+        hideAllProgress();
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(model.error());
         adapter.setData(new ArrayList<>());
     }
 }

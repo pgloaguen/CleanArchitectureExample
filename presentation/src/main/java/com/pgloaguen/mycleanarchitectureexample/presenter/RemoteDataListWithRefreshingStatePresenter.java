@@ -12,6 +12,14 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.displayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.emptyState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.refreshingState;
+
 /**
  * Created by paul on 26/01/2017.
  */
@@ -24,6 +32,7 @@ public abstract class RemoteDataListWithRefreshingStatePresenter<T, P> {
 
     private PresenterListener<RemoteDataWithRefreshingState<List<T>>> listener;
     private RemoteDataWithRefreshingState<List<T>> currentModel;
+    private String error;
 
     public RemoteDataListWithRefreshingStatePresenter(UseCase<List<T>, P> usecase) {
         this.usecase = usecase;
@@ -32,7 +41,7 @@ public abstract class RemoteDataListWithRefreshingStatePresenter<T, P> {
     public void init(PresenterListener<RemoteDataWithRefreshingState<List<T>>> listener) {
         this.listener = listener;
         data.clear();
-        notify(RemoteDataWithRefreshingState.loadingState());
+        notify(loadingState());
     }
 
     public void onStart() {
@@ -40,15 +49,23 @@ public abstract class RemoteDataListWithRefreshingStatePresenter<T, P> {
     }
 
     public void onStop() {
-        compositeDisposable.dispose();
+        compositeDisposable.clear();
     }
 
     public void onDestroy() {
+        compositeDisposable.dispose();
         this.listener = null;
     }
 
     public void askForRefresh() {
-        notify(RemoteDataWithRefreshingState.refreshingState(new ArrayList<>(data)));
+        if (error != null) {
+            notify(loadingWithErrorState(error));
+        } else if (data.isEmpty()) {
+            notify(loadingState());
+        } else {
+            notify(refreshingState(new ArrayList<>(data)));
+        }
+
         executeUseCase();
     }
 
@@ -67,13 +84,14 @@ public abstract class RemoteDataListWithRefreshingStatePresenter<T, P> {
     }
 
     private void onSuccess(@NonNull List<T> repoEntities) {
+        error = null;
         data.clear();
         data.addAll(repoEntities);
-        notify(RemoteDataWithRefreshingState.displayDataState(repoEntities));
+        notify(data.isEmpty() ? emptyState() : displayDataState(repoEntities));
     }
 
     private void onError(Throwable throwable) {
-        data.clear();
-        notify(RemoteDataWithRefreshingState.errorState(throwable.getMessage()));
+        error = throwable.getMessage();
+        notify(data.isEmpty() ? errorState(throwable.getMessage()) : errorWithDisplayDataState(error, data));
     }
 }

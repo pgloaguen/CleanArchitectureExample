@@ -17,10 +17,16 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.TestScheduler;
 
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.displayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.emptyState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.refreshingState;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -40,6 +46,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
     RemoteDataListWithRefreshingStatePresenter<String, String> presenter;
 
     List<String> answer;
+    List<String> emptyAnswer;
     NullPointerException errorAnswer;
 
     @Before
@@ -52,6 +59,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         };
         answer = new ArrayList<>();
         answer.add("test");
+        emptyAnswer = new ArrayList<>();
         errorAnswer = new NullPointerException("null");
     }
 
@@ -63,8 +71,8 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.init(presenterListener);
         presenter.onStart();
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
+        verify(presenterListener, times(1)).update(loadingState());
+        verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 
     @Test
@@ -74,7 +82,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.init(presenterListener);
         presenter.onStart();
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
+        verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(any(RemoteDataWithRefreshingState.ErrorState.class));
     }
 
@@ -86,9 +94,9 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.onStart();
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.refreshingState(answer));
-        verify(presenterListener, times(2)).update(RemoteDataWithRefreshingState.displayDataState(answer));
+        verify(presenterListener, times(1)).update(loadingState());
+        verify(presenterListener, times(1)).update(refreshingState(answer));
+        verify(presenterListener, times(2)).update(displayDataState(answer));
     }
 
     @Test
@@ -100,11 +108,11 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
+        verify(presenterListener, times(1)).update(loadingState());
+        verify(presenterListener, times(1)).update(displayDataState(answer));
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.refreshingState(answer));
-        verify(presenterListener, times(1)).update(any(RemoteDataWithRefreshingState.ErrorState.class));
+        verify(presenterListener, times(1)).update(refreshingState(answer));
+        verify(presenterListener, times(1)).update(errorWithDisplayDataState(errorAnswer.getMessage(), answer));
     }
 
     @Test
@@ -116,10 +124,25 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
-        verify(presenterListener, times(1)).update(any(RemoteDataWithRefreshingState.ErrorState.class));
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.refreshingState(new ArrayList<>()));
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
+        verify(presenterListener, times(1)).update(loadingState());
+        verify(presenterListener, times(1)).update(errorState(errorAnswer.getMessage()));
+        verify(presenterListener, times(1)).update(loadingWithErrorState(errorAnswer.getMessage()));
+        verify(presenterListener, times(1)).update(displayDataState(answer));
+    }
+
+    @Test
+    public void initEmptyAnswerThenAskToRefresh() {
+        given(useCase.execute(anyString())).willReturn(Observable.just(emptyAnswer));
+
+        presenter.init(presenterListener);
+        presenter.onStart();
+
+        given(useCase.execute(anyString())).willReturn(Observable.just(answer));
+        presenter.askForRefresh();
+
+        verify(presenterListener, times(2)).update(loadingState());
+        verify(presenterListener, times(1)).update(emptyState());
+        verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 
     @Test
@@ -133,8 +156,8 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
 
         testScheduler.advanceTimeBy(20, TimeUnit.SECONDS);
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.loadingState());
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
+        verify(presenterListener, times(1)).update(loadingState());
+        verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 
     @Test
@@ -150,6 +173,6 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.onDestroy();
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
-        verify(presenterListener, times(1)).update(RemoteDataWithRefreshingState.displayDataState(answer));
+        verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 }

@@ -6,10 +6,15 @@ import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
-import java.util.List;
-
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.displayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.errorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.loadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.refreshingState;
 
 /**
  * Created by paul on 26/01/2017.
@@ -20,6 +25,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private final UseCase<T, P> useCase;
     private T data = null;
+    private String error = null;
 
     private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
     private RemoteDataWithRefreshingState<T> currentModel;
@@ -31,7 +37,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     public void init(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
         this.listener = listener;
         data = null;
-        notify(RemoteDataWithRefreshingState.loadingState());
+        notify(loadingState());
     }
 
     public void onStart() {
@@ -39,15 +45,20 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     }
 
     public void onStop() {
-        compositeDisposable.dispose();
+        compositeDisposable.clear();
     }
 
     public void onDestroy() {
+        compositeDisposable.dispose();
         this.listener = null;
     }
 
     public void askForRefresh() {
-        notify(RemoteDataWithRefreshingState.refreshingState(data));
+        if (data != null) {
+            notify(refreshingState(data));
+        } else if (error != null) {
+            notify(loadingWithErrorState(error));
+        }
         executeUseCase();
     }
 
@@ -67,11 +78,12 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
 
     private void onSuccess(@NonNull T data) {
         this.data = data;
-        notify(RemoteDataWithRefreshingState.displayDataState(data));
+        this.error = null;
+        notify(displayDataState(data));
     }
 
     private void onError(Throwable throwable) {
-        this.data = null;
-        notify(RemoteDataWithRefreshingState.errorState(throwable.getMessage()));
+        this.error = throwable.getMessage();
+        notify(data == null ? errorState(error) : errorWithDisplayDataState(error, data));
     }
 }
