@@ -27,7 +27,9 @@ public class ListUserRepoPresenter extends RemoteDataListWithRefreshingStatePres
 
     @Override
     public Observable<List<RepoEntity>> executeUseCase(UseCase<List<RepoEntity>, String> useCase) {
-        return useCase.execute("pgloaguen");
+        return useCase.execute("pgloaguen")
+                    .flatMapSingle(l -> Observable.fromIterable(l).map(r -> r.desc().isEmpty() ? RepoEntity.create(r.id(), r.name(), "No description") : r).toList());
+
     }
 
     public void onRepoClick(RepoEntity repoEntity){

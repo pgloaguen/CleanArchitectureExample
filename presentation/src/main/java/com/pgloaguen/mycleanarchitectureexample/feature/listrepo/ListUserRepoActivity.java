@@ -43,6 +43,9 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
     @BindView(R.id.progress)
     ContentLoadingProgressBar progressBar;
 
+    @BindView(R.id.error_screen)
+    View errorScreen;
+
     @BindView(R.id.error)
     TextView errorTextView;
 
@@ -89,11 +92,11 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
 
     private void showError(String error) {
         errorTextView.setText(error);
-        errorTextView.setVisibility(View.VISIBLE);
+        errorScreen.setVisibility(View.VISIBLE);
     }
 
     private void hideError() {
-        errorTextView.setVisibility(GONE);
+        errorScreen.setVisibility(GONE);
     }
 
     private void clearData() {
