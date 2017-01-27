@@ -87,54 +87,70 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
         progressBar.hide();
     }
 
+    private void showError(String error) {
+        errorTextView.setText(error);
+        errorTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideError() {
+        errorTextView.setVisibility(GONE);
+    }
+
+    private void clearData() {
+        adapter.setData(new ArrayList<>());
+    }
+
+    private void setData(List<RepoEntity> repoEntities) {
+        adapter.setData(repoEntities);
+    }
+
     @Override
     protected void displayFirstFetchLoadingScreen() {
         progressBar.show();
-        adapter.setData(new ArrayList<>());
-        errorTextView.setVisibility(GONE);
+        clearData();
+        hideError();
     }
 
     @Override
     protected void displayRefreshingScreen(RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>> model) {
         if (!swipeRefreshLayout.isRefreshing()) swipeRefreshLayout.setRefreshing(true);
-        errorTextView.setVisibility(GONE);
-        adapter.setData(model.datas());
+        hideError();
+        setData(model.datas());
     }
 
     @Override
     protected void displayLoadingWithErrorScreen(LoadingWithErrorState viewModel) {
         progressBar.show();
-        adapter.setData(new ArrayList<>());
-        errorTextView.setVisibility(View.VISIBLE);
+        showError(viewModel.error());
+        clearData();
     }
 
     @Override
     protected void displayEmptyScreen() {
         hideAllProgress();
-        errorTextView.setVisibility(GONE);
-        adapter.setData(new ArrayList<>());
+        hideError();
+        clearData();
     }
 
     @Override
     protected void displayDataScreen(@NonNull RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>> model) {
         hideAllProgress();
-        errorTextView.setVisibility(GONE);
-        adapter.setData(model.datas());
+        hideError();
+        setData(model.datas());
     }
 
     @Override
     protected void displayErrorWithDataScreen(ErrorWithDisplayDataState<List<RepoEntity>> model) {
         hideAllProgress();
-        errorTextView.setVisibility(GONE);
-        adapter.setData(model.datas());
+        hideError();
+        setData(model.datas());
         Toast.makeText(this, model.error(), Toast.LENGTH_LONG).show();
     }
 
     @Override
     protected void displayErrorScreen(@NonNull RemoteDataWithRefreshingState.ErrorState model) {
         hideAllProgress();
-        errorTextView.setVisibility(View.VISIBLE);
-        errorTextView.setText(model.error());
-        adapter.setData(new ArrayList<>());
+        showError(model.error());
+        clearData();
     }
 }
