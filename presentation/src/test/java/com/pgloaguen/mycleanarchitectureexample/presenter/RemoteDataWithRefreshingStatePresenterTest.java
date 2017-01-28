@@ -68,7 +68,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         presenter.onStart();
 
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
     }
@@ -80,7 +80,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         presenter.init(presenterListener);
         presenter.onStart();
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(errorState(errorAnswer.getMessage()));
     }
@@ -93,7 +93,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         presenter.onStart();
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(refreshingState(answer));
         verify(presenterListener, times(2)).update(displayDataState(answer));
@@ -108,7 +108,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
 
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
@@ -126,7 +126,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(errorState(errorAnswer.getMessage()));
         verify(presenterListener, times(1)).update(loadingWithErrorState(errorAnswer.getMessage()));
@@ -144,7 +144,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
 
         testScheduler.advanceTimeBy(20, TimeUnit.SECONDS);
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
     }
@@ -162,7 +162,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         presenter.onDestroy();
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
-        verify(presenterListener, times(1)).update(emptyState(null));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 

@@ -1,7 +1,6 @@
 package com.pgloaguen.mycleanarchitectureexample.navigator;
 
 import android.app.Activity;
-import android.content.Intent;
 
 import com.pgloaguen.mycleanarchitectureexample.feature.repodetails.RepoDetailsActivity;
 

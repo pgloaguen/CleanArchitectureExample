@@ -78,7 +78,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         this.data = newData;
     }
 
-    public void setListener(OnRepoClick listener) {
+    public void setListener(@Nullable OnRepoClick listener) {
         this.listener = listener;
     }
 

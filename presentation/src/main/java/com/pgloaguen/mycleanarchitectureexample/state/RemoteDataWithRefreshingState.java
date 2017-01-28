@@ -2,7 +2,6 @@ package com.pgloaguen.mycleanarchitectureexample.state;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 
@@ -43,7 +42,7 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
     @AutoValue
     public abstract static class RefreshingState<D> extends RemoteDataWithRefreshingState<D> {
-        @Nullable
+        @NonNull
         public abstract D datas();
     }
 
@@ -54,7 +53,7 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
     @AutoValue
     public abstract static class DisplayDataState<D> extends RemoteDataWithRefreshingState<D> {
-        @Nullable
+        @NonNull
         public abstract D datas();
     }
 
@@ -69,36 +68,36 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
         public abstract String error();
 
-        @Nullable
+        @NonNull
         public abstract D datas();
     }
 
     public static <D> RemoteDataWithRefreshingState<D> loadingState() {
-        return new AutoValue_RemoteDataWithRefreshingState_LoadingState<D>(LOADING_STATE);
+        return new AutoValue_RemoteDataWithRefreshingState_LoadingState<>(LOADING_STATE);
     }
 
-    public static <D> RemoteDataWithRefreshingState<D> refreshingState(D data) {
-        return new AutoValue_RemoteDataWithRefreshingState_RefreshingState<D>(REFRESHING_STATE, data);
+    public static <D> RemoteDataWithRefreshingState<D> refreshingState(@NonNull D data) {
+        return new AutoValue_RemoteDataWithRefreshingState_RefreshingState<>(REFRESHING_STATE, data);
     }
 
     public static <D> RemoteDataWithRefreshingState<D> loadingWithErrorState(String message) {
-        return new AutoValue_RemoteDataWithRefreshingState_LoadingWithErrorState<D>(LOADING_WITH_ERROR_STATE, message);
+        return new AutoValue_RemoteDataWithRefreshingState_LoadingWithErrorState<>(LOADING_WITH_ERROR_STATE, message);
     }
 
-    public static <D> RemoteDataWithRefreshingState<D> displayDataState(D data) {
-        return new AutoValue_RemoteDataWithRefreshingState_DisplayDataState<D>(DISPLAY_DATA_STATE, data);
+    public static <D> RemoteDataWithRefreshingState<D> displayDataState(@NonNull D data) {
+        return new AutoValue_RemoteDataWithRefreshingState_DisplayDataState<>(DISPLAY_DATA_STATE, data);
     }
 
-    public static <D> RemoteDataWithRefreshingState<D> emptyState(D data) {
-        return new AutoValue_RemoteDataWithRefreshingState_EmptyState<D>(EMPTY_STATE);
+    public static <D> RemoteDataWithRefreshingState<D> emptyState() {
+        return new AutoValue_RemoteDataWithRefreshingState_EmptyState<>(EMPTY_STATE);
     }
 
     public static <D> RemoteDataWithRefreshingState<D> errorState(@NonNull String messageError) {
-        return new AutoValue_RemoteDataWithRefreshingState_ErrorState<D>(ERROR_STATE, messageError);
+        return new AutoValue_RemoteDataWithRefreshingState_ErrorState<>(ERROR_STATE, messageError);
     }
 
-    public static <D> RemoteDataWithRefreshingState<D> errorWithDisplayDataState(String message, D data) {
-        return new AutoValue_RemoteDataWithRefreshingState_ErrorWithDisplayDataState<D>(ERROR_WITH_DATA_STATE, message, data);
+    public static <D> RemoteDataWithRefreshingState<D> errorWithDisplayDataState(String message, @NonNull D data) {
+        return new AutoValue_RemoteDataWithRefreshingState_ErrorWithDisplayDataState<>(ERROR_WITH_DATA_STATE, message, data);
     }
 
 }

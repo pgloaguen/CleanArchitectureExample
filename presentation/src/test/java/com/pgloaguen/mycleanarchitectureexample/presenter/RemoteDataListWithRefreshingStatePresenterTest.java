@@ -1,5 +1,7 @@
 package com.pgloaguen.mycleanarchitectureexample.presenter;
 
+import android.support.annotation.NonNull;
+
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
@@ -52,7 +54,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
     public void setup() {
         presenter = new RemoteDataListWithRefreshingStatePresenter<String, String>(useCase) {
             @Override
-            public Observable<List<String>> executeUseCase(UseCase<List<String>, String> useCase) {
+            public Observable<List<String>> executeUseCase(@NonNull UseCase<List<String>, String> useCase) {
                 return useCase.execute("");
             }
         };
@@ -95,7 +97,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.onStart();
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(emptyState(new ArrayList<>()));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(refreshingState(answer));
         verify(presenterListener, times(2)).update(displayDataState(answer));
@@ -110,7 +112,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(emptyState(new ArrayList<>()));
+        verify(presenterListener, times(1)).update(emptyState());
 
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
@@ -128,7 +130,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.askForRefresh();
 
-        verify(presenterListener, times(1)).update(emptyState(new ArrayList<>()));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(errorState(errorAnswer.getMessage()));
         verify(presenterListener, times(1)).update(loadingWithErrorState(errorAnswer.getMessage()));
@@ -146,7 +148,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.askForRefresh();
 
         verify(presenterListener, times(2)).update(loadingState());
-        verify(presenterListener, times(2)).update(emptyState(new ArrayList<>()));
+        verify(presenterListener, times(2)).update(emptyState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 

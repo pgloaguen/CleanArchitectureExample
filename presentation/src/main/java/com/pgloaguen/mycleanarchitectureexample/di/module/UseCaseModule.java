@@ -1,6 +1,5 @@
 package com.pgloaguen.mycleanarchitectureexample.di.module;
 
-import com.pgloaguen.data.model.RepoDetails;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;

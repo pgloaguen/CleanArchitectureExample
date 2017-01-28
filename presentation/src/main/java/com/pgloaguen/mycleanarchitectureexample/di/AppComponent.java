@@ -4,10 +4,8 @@ import com.pgloaguen.data.di.DataComponent;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
-import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.di.scope.AppScope;
-import com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoActivity;
 import com.pgloaguen.mycleanarchitectureexample.di.module.UseCaseModule;
 
 import java.util.List;

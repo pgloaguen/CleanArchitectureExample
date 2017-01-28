@@ -39,7 +39,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
 
     public void init(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
         this.listener = listener;
-        notify(emptyState(null));
+        notify(emptyState());
     }
 
     public void onStart() {

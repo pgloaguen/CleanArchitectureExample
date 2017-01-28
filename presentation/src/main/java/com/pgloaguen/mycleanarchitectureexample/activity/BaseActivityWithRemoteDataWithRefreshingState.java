@@ -1,5 +1,7 @@
 package com.pgloaguen.mycleanarchitectureexample.activity;
 
+import android.support.annotation.NonNull;
+
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
@@ -23,7 +25,7 @@ import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefre
 public abstract class BaseActivityWithRemoteDataWithRefreshingState<S> extends BaseActivity implements PresenterListener<RemoteDataWithRefreshingState<S>> {
 
     @Override
-    public void update(RemoteDataWithRefreshingState<S> viewModel) {
+    public void update(@NonNull RemoteDataWithRefreshingState<S> viewModel) {
         switch (viewModel.state()) {
             case LOADING_STATE:
                 displayFirstFetchLoadingScreen();

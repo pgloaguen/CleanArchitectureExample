@@ -1,5 +1,7 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
+import android.support.annotation.NonNull;
+
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.navigator.Navigator;
@@ -26,7 +28,7 @@ public class ListUserRepoPresenter extends RemoteDataListWithRefreshingStatePres
     }
 
     @Override
-    public Observable<List<RepoEntity>> executeUseCase(UseCase<List<RepoEntity>, String> useCase) {
+    public Observable<List<RepoEntity>> executeUseCase(@NonNull UseCase<List<RepoEntity>, String> useCase) {
         return useCase.execute("pgloaguen")
                     .flatMapSingle(l -> Observable.fromIterable(l).map(r -> r.desc().isEmpty() ? RepoEntity.create(r.id(), r.name(), "No description") : r).toList());
 
