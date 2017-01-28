@@ -3,12 +3,17 @@ package com.pgloaguen.mycleanarchitectureexample.activity;
 import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.DISPLAY_DATA_STATE;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.DisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.EmptyState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.EMPTY_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ERROR_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ERROR_WITH_DATA_STATE;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LOADING_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LOADING_WITH_ERROR_STATE;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.REFRESHING_STATE;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.RefreshingState;
 
 /**
@@ -19,22 +24,28 @@ public abstract class BaseActivityWithRemoteDataWithRefreshingState<S> extends B
 
     @Override
     public void update(RemoteDataWithRefreshingState<S> viewModel) {
-        if (viewModel instanceof LoadingState) {
-            displayFirstFetchLoadingScreen();
-        } else if(viewModel instanceof LoadingWithErrorState) {
-            displayLoadingWithErrorScreen(((LoadingWithErrorState<S>) viewModel));
-        } else if (viewModel instanceof RefreshingState) {
-            displayRefreshingScreen(((RefreshingState<S>) viewModel));
-        } else if(viewModel instanceof EmptyState) {
-            displayEmptyScreen();
-        } else if (viewModel instanceof DisplayDataState){
-            displayDataScreen(((DisplayDataState<S>) viewModel));
-        } else if(viewModel instanceof ErrorState) {
-            displayErrorScreen(((ErrorState) viewModel));
-        } else if(viewModel instanceof ErrorWithDisplayDataState) {
-            displayErrorWithDataScreen(((ErrorWithDisplayDataState<S>) viewModel));
-        } else {
-            throw new IllegalStateException(viewModel.getClass() + " is not an handled state");
+        switch (viewModel.state()) {
+            case LOADING_STATE:
+                displayFirstFetchLoadingScreen();
+                break;
+            case LOADING_WITH_ERROR_STATE:
+                displayLoadingWithErrorScreen(((LoadingWithErrorState<S>) viewModel));
+                break;
+            case REFRESHING_STATE:
+                displayRefreshingScreen(((RefreshingState<S>) viewModel));
+                break;
+            case EMPTY_STATE:
+                displayEmptyScreen();
+                break;
+            case DISPLAY_DATA_STATE:
+                displayDataScreen(((DisplayDataState<S>) viewModel));
+                break;
+            case ERROR_STATE:
+                displayErrorScreen(((ErrorState) viewModel));
+                break;
+            case ERROR_WITH_DATA_STATE:
+                displayErrorWithDataScreen(((ErrorWithDisplayDataState<S>) viewModel));
+                break;
         }
     }
 
