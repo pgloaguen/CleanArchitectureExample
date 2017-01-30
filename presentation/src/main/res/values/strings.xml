@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyCleanArchitectureExample</string>
+    <string name="repositories">Repositories</string>
 </resources>

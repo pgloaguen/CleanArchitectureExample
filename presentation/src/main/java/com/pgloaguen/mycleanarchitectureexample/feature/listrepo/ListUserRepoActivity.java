@@ -1,11 +1,11 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.activity.BaseActivityWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.presenter.RemoteDataWithRefreshingStatePresenter;
 import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
 
@@ -32,6 +34,9 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
 
     @Inject
     ListUserRepoPresenter presenter;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     @BindView(R.id.swipeRefreshLayout)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -51,38 +56,20 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
     private RepoAdapter adapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected RemoteDataWithRefreshingStatePresenter init() {
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
 
+        ButterKnife.bind(this);
         activityComponent().inject(this);
 
+        toolbar.setTitle(R.string.repositories);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RepoAdapter();
         recycler.setAdapter(adapter);
         adapter.setListener(presenter::onRepoClick);
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
         presenter.init(this);
-        presenter.onCreate();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        presenter.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        presenter.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.onDestroy();
+        return presenter;
     }
 
     private void hideAllProgress() {
@@ -92,7 +79,7 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
 
     private void showError(String error) {
         errorTextView.setText(error);
-        errorScreen.setVisibility(View.VISIBLE);
+        errorScreen.setVisibility(VISIBLE);
     }
 
     private void hideError() {
