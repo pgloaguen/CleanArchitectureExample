@@ -3,12 +3,8 @@ package com.pgloaguen.domain.usecase;
 
 import com.google.auto.value.AutoValue;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
-import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
-import com.pgloaguen.domain.repository.GetUserRepoRepository;
 import com.pgloaguen.domain.usecase.base.UseCase;
-
-import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;

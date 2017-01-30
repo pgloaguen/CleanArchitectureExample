@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -46,17 +45,12 @@ public class GetUserRepoTest {
 
         TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
         testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
-        testObserver.assertValue(new Predicate<List<RepoEntity>>() {
-            @Override
-            public boolean test(List<RepoEntity> repoEntities) throws Exception {
-                return !repoEntities.isEmpty();
-            }
-        });
+        testObserver.assertValue(repoEntities -> !repoEntities.isEmpty());
     }
 
     @Test
     public void getUserRepoUseCaseExceptionThrown() throws Exception {
-        given(repository.listUserRepo(anyString())).willReturn(Observable.<List<RepoEntity>>error(new NullPointerException("null")));
+        given(repository.listUserRepo(anyString())).willReturn(Observable.error(new NullPointerException("null")));
 
         TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
         testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);

@@ -1,7 +1,6 @@
 package com.pgloaguen.domain.usecase.base;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.Scheduler;
 
@@ -20,12 +19,7 @@ public abstract class UseCase<R, P> {
     }
 
     private ObservableTransformer<R, R> applySchedulers() {
-        return new ObservableTransformer<R, R>() {
-            @Override
-            public ObservableSource<R> apply(Observable<R> upstream) {
-                return upstream.subscribeOn(runScheduler).observeOn(postScheduler);
-            }
-        };
+        return upstream -> upstream.subscribeOn(runScheduler).observeOn(postScheduler);
     }
 
     protected abstract Observable<R> build(P param);

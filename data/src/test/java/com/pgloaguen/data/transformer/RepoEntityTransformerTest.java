@@ -25,7 +25,7 @@ public class RepoEntityTransformerTest {
     @Test
     public void transformRepoToRepoEntityHappyCase() {
 
-        given(repo.id()).willReturn(1l);
+        given(repo.id()).willReturn(1L);
         given(repo.name()).willReturn("toto");
         given(repo.description()).willReturn("desc");
 
@@ -39,7 +39,7 @@ public class RepoEntityTransformerTest {
     @Test
     public void transformRepoToRepoEntityDescIsNull() {
 
-        given(repo.id()).willReturn(1l);
+        given(repo.id()).willReturn(1L);
         given(repo.name()).willReturn("toto");
         given(repo.description()).willReturn(null);
 

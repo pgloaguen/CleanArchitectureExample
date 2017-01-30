@@ -1,10 +1,15 @@
 package com.pgloaguen.data.net;
 
 
+import android.content.Context;
+
 import com.pgloaguen.data.di.DaggerDataComponentTest;
+import com.pgloaguen.data.di.NetModule;
+import com.pgloaguen.data.di.RepositoryModule;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.inject.Inject;
@@ -21,9 +26,12 @@ public class GetUserRepoDetailsWsTest {
     @Inject
     Retrofit retrofit;
 
+    @Mock
+    Context context;
+
     @Test
     public void getUserRepoWsWorks() {
-        DaggerDataComponentTest.create().inject(this);
+        DaggerDataComponentTest.builder().netModule(new NetModule()).repositoryModule(new RepositoryModule(context)).build().inject(this);
 
         retrofit.create(GetUserRepoDetailsEndpoint.class).fetch("pgloaguen", "CleanArchitectureExample").test().assertNoErrors();
     }
