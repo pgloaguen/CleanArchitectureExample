@@ -27,18 +27,6 @@ import retrofit2.Retrofit;
 @Module
 public class RepositoryModule {
 
-    private final Context context;
-
-    public RepositoryModule(Context context) {
-        this.context = context;
-    }
-
-    @Provides
-    @Singleton
-    public ConnectionUtils provideConnectionUtils() {
-        return new ConnectionUtils(((ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE)));
-    }
-
     @Provides
     @Singleton
     public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit, ConnectionUtils connectionUtils) {

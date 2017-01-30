@@ -25,8 +25,8 @@ public class CleanApplication extends Application {
                 .dataComponent(
                         DaggerDataComponent
                                 .builder()
-                                .netModule(new NetModule())
-                                .repositoryModule(new RepositoryModule(getApplicationContext()))
+                                .netModule(new NetModule(getApplicationContext()))
+                                .repositoryModule(new RepositoryModule())
                                 .build())
                 .build();
     }

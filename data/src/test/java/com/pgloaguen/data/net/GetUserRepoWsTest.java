@@ -30,7 +30,7 @@ public class GetUserRepoWsTest {
 
     @Test
     public void getUserRepoWsWorks() {
-        DaggerDataComponentTest.builder().netModule(new NetModule()).repositoryModule(new RepositoryModule(context)).build().inject(this);
+        DaggerDataComponentTest.builder().netModule(new NetModule(context)).repositoryModule(new RepositoryModule()).build().inject(this);
 
         retrofit.create(GetUserRepoEndpoint.class).list("pgloaguen").test().assertNoErrors();
     }
