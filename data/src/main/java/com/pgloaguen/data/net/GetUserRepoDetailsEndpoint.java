@@ -1,9 +1,6 @@
 package com.pgloaguen.data.net;
 
-import com.pgloaguen.data.model.Repo;
 import com.pgloaguen.data.model.RepoDetails;
-
-import java.util.List;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;

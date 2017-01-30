@@ -72,7 +72,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.init(presenterListener);
         presenter.onStart();
 
-        verify(presenterListener, times(1)).update(emptyState(new ArrayList<>()));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
     }
@@ -84,7 +84,7 @@ public class RemoteDataListWithRefreshingStatePresenterTest {
         presenter.init(presenterListener);
         presenter.onStart();
 
-        verify(presenterListener, times(1)).update(emptyState(new ArrayList<>()));
+        verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
         verify(presenterListener, times(1)).update(errorState(errorAnswer.getMessage()));
     }

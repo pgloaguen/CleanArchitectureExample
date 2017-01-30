@@ -1,6 +1,10 @@
 package com.pgloaguen.data.di;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+
 import com.pgloaguen.data.net.GetUserRepoDetailsEndpoint;
+import com.pgloaguen.data.net.utils.ConnectionUtils;
 import com.pgloaguen.data.repository.GetUserRepoDetailsRepositoryImpl;
 import com.pgloaguen.data.net.GetUserRepoEndpoint;
 import com.pgloaguen.data.repository.GetUserRepoRepositoryImpl;
@@ -25,13 +29,13 @@ public class RepositoryModule {
 
     @Provides
     @Singleton
-    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit) {
-        return new GetUserRepoRepositoryImpl(retrofit.create(GetUserRepoEndpoint.class), new RepoEntityTransformer());
+    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit, ConnectionUtils connectionUtils) {
+        return new GetUserRepoRepositoryImpl(retrofit.create(GetUserRepoEndpoint.class), new RepoEntityTransformer(), connectionUtils);
     }
 
     @Provides
     @Singleton
-    public GetUserRepoDetailsRepository buildGetUserRepoDetailsRepository(Retrofit retrofit) {
-        return new GetUserRepoDetailsRepositoryImpl(retrofit.create(GetUserRepoDetailsEndpoint.class), new RepoDetailsEntityTransformer());
+    public GetUserRepoDetailsRepository buildGetUserRepoDetailsRepository(Retrofit retrofit, ConnectionUtils connectionUtils) {
+        return new GetUserRepoDetailsRepositoryImpl(retrofit.create(GetUserRepoDetailsEndpoint.class), new RepoDetailsEntityTransformer(), connectionUtils);
     }
 }

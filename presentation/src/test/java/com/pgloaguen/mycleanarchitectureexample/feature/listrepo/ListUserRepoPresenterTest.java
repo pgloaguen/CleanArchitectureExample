@@ -16,10 +16,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -53,7 +49,6 @@ public class ListUserRepoPresenterTest {
 
     @Test
     public void presenterDisplayDetailsWhenRepoClick() {
-        given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.init(presenterListener);
 
         presenter.onRepoClick(answer.get(0));

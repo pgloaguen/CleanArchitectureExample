@@ -2,6 +2,7 @@ package com.pgloaguen.data.repository;
 
 import com.pgloaguen.data.model.Repo;
 import com.pgloaguen.data.net.GetUserRepoEndpoint;
+import com.pgloaguen.data.net.utils.ConnectionUtils;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
 import com.pgloaguen.domain.entity.RepoEntity;
 
@@ -10,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -39,13 +40,17 @@ public class GetUserRepoEndpointTest {
     @Mock
     RepoEntityTransformer transformer;
 
+    @Mock
+    ConnectionUtils connectionUtils;
+
     @Test
     public void listUserRepo() throws Exception {
 
-        given(userRepoWS.list(anyString())).willReturn(Single.just(Arrays.asList(mock(Repo.class))));
+        given(userRepoWS.list(anyString())).willReturn(Single.just(Collections.singletonList(mock(Repo.class))));
         given(transformer.transform(any())).willReturn(mock(RepoEntity.class));
+        given(connectionUtils.isConnected()).willReturn(true);
 
-        Observable<List<RepoEntity>> o = new GetUserRepoRepositoryImpl(userRepoWS, transformer).listUserRepo("");
+        Observable<List<RepoEntity>> o = new GetUserRepoRepositoryImpl(userRepoWS, transformer, connectionUtils).listUserRepo("");
         o.subscribe(consumer);
 
         verify(consumer).accept(anyList());
