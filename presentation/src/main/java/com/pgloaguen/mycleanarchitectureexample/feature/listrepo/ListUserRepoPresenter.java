@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.navigator.Navigator;
-import com.pgloaguen.mycleanarchitectureexample.presenter.RemoteDataWithRefreshingStatePresenter;
+import com.pgloaguen.mycleanarchitectureexample.base.presenter.RemoteDataWithRefreshingStatePresenter;
 
 import java.util.List;
 

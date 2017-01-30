@@ -1,4 +1,4 @@
-package com.pgloaguen.mycleanarchitectureexample.activity;
+package com.pgloaguen.mycleanarchitectureexample.base.activity;
 
 import android.support.v7.app.AppCompatActivity;
 

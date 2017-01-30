@@ -1,22 +1,22 @@
-package com.pgloaguen.mycleanarchitectureexample.activity;
+package com.pgloaguen.mycleanarchitectureexample.base.activity;
 
 import android.support.annotation.NonNull;
 
-import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
-import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterListener;
+import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.DISPLAY_DATA_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.DisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.EMPTY_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ERROR_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ERROR_WITH_DATA_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LOADING_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LOADING_WITH_ERROR_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.REFRESHING_STATE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.RefreshingState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DISPLAY_DATA_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.EMPTY_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ERROR_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ERROR_WITH_DATA_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LOADING_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LOADING_WITH_ERROR_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.REFRESHING_STATE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.RefreshingState;
 
 /**
  * Created by paul on 27/01/2017.

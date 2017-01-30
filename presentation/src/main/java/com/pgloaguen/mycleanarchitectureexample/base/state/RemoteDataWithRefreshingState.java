@@ -1,4 +1,4 @@
-package com.pgloaguen.mycleanarchitectureexample.state;
+package com.pgloaguen.mycleanarchitectureexample.base.state;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;

@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
-import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivityWithRemoteDataWithRefreshingState;
-import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.activity.BaseActivityWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
 
 
 public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshingState<List<RepoEntity>>  {

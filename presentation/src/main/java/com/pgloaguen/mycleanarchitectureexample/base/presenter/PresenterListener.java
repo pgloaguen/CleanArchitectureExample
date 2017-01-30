@@ -1,4 +1,4 @@
-package com.pgloaguen.mycleanarchitectureexample;
+package com.pgloaguen.mycleanarchitectureexample.base.presenter;
 
 import android.support.annotation.NonNull;
 

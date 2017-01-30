@@ -8,21 +8,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
-import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
+import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
-import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivityWithRemoteDataWithRefreshingState;
-import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.activity.BaseActivityWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.DisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.RefreshingState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.RefreshingState;
 
 /**
  * Created by paul on 26/01/2017.
