@@ -11,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.activity.BaseActivityWithRemoteDataWithRefreshingState;
 import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
@@ -29,7 +28,7 @@ import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefre
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
 
 
-public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshingState<List<RepoEntity>> implements PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> {
+public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshingState<List<RepoEntity>>  {
 
     @Inject
     ListUserRepoPresenter presenter;
@@ -65,6 +64,7 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
         adapter.setListener(presenter::onRepoClick);
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
         presenter.init(this);
+        presenter.onCreate();
     }
 
     @Override

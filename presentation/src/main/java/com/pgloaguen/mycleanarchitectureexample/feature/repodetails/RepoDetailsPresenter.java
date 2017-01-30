@@ -3,7 +3,9 @@ package com.pgloaguen.mycleanarchitectureexample.feature.repodetails;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
 import com.pgloaguen.domain.usecase.base.UseCase;
+import com.pgloaguen.mycleanarchitectureexample.PresenterListener;
 import com.pgloaguen.mycleanarchitectureexample.presenter.RemoteDataWithRefreshingStatePresenter;
+import com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState;
 
 import javax.inject.Inject;
 
@@ -23,7 +25,8 @@ public class RepoDetailsPresenter extends RemoteDataWithRefreshingStatePresenter
         super(useCase);
     }
 
-    public void init(String username, String repoName) {
+    public void init(PresenterListener<RemoteDataWithRefreshingState<RepoDetailsEntity>> listener,  String username, String repoName) {
+        super.init(listener);
         this.username = username;
         this.repoName = repoName;
     }

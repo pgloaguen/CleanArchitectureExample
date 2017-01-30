@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -39,9 +41,16 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     PresenterListener<RemoteDataWithRefreshingState<String>> presenterListener;
 
     @Mock
+    PresenterListener<RemoteDataWithRefreshingState<List<String>>> listPresenterListener;
+
+    @Mock
     UseCase<String, String> useCase;
 
+    @Mock
+    UseCase<List<String>, String> listUseCase;
+
     RemoteDataWithRefreshingStatePresenter<String, String> presenter;
+    RemoteDataWithRefreshingStatePresenter<List<String>, String> listPresenter;
 
     String answer;
     NullPointerException errorAnswer;
@@ -55,6 +64,13 @@ public class RemoteDataWithRefreshingStatePresenterTest {
                 return useCase.execute("");
             }
         };
+
+        listPresenter = new RemoteDataWithRefreshingStatePresenter<List<String>, String>(listUseCase) {
+            @Override
+            public Observable<List<String>> executeUseCase(UseCase<List<String>, String> useCase) {
+                return useCase.execute("");
+            }
+        };
         answer = "test";
         errorAnswer = new NullPointerException("null");
     }
@@ -65,6 +81,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
 
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
 
 
@@ -74,10 +91,25 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     }
 
     @Test
+    public void initEmptyListCase() {
+
+        given(listUseCase.execute(anyString())).willReturn(Observable.just(Collections.emptyList()));
+
+        listPresenter.init(listPresenterListener);
+        listPresenter.onCreate();
+        listPresenter.onStart();
+
+
+        verify(listPresenterListener, times(2)).update(emptyState());
+        verify(listPresenterListener, times(1)).update(loadingState());
+    }
+
+    @Test
     public void initErrorCase() {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
 
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
 
         verify(presenterListener, times(1)).update(emptyState());
@@ -90,6 +122,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
 
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
         presenter.askForRefresh();
 
@@ -103,6 +136,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void initHappyCaseRefreshErrorCase() {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
 
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
@@ -121,6 +155,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void initErrorThenRefreshHappyCase() {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
 
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
@@ -138,6 +173,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         TestScheduler testScheduler = new TestScheduler();
         given(useCase.execute(anyString())).willReturn(Observable.just(answer).delay(10, TimeUnit.SECONDS, testScheduler));
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
         presenter.askForRefresh();
         presenter.askForRefresh();
@@ -155,6 +191,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         TestScheduler testScheduler = new TestScheduler();
         given(useCase.execute(anyString())).willReturn(Observable.just(answer).delay(10, TimeUnit.SECONDS, testScheduler));
         presenter.init(presenterListener);
+        presenter.onCreate();
         presenter.onStart();
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
         presenter.askForRefresh();

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.navigator.Navigator;
-import com.pgloaguen.mycleanarchitectureexample.presenter.RemoteDataListWithRefreshingStatePresenter;
+import com.pgloaguen.mycleanarchitectureexample.presenter.RemoteDataWithRefreshingStatePresenter;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import io.reactivex.Observable;
  * Created by paul on 20/01/2017.
  */
 
-public class ListUserRepoPresenter extends RemoteDataListWithRefreshingStatePresenter<RepoEntity, String> {
+public class ListUserRepoPresenter extends RemoteDataWithRefreshingStatePresenter<List<RepoEntity>, String> {
 
     private final Navigator navigator;
 

@@ -3,7 +3,6 @@ package com.pgloaguen.mycleanarchitectureexample.feature.repodetails;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,8 +23,6 @@ import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefre
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
 import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.RefreshingState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.EmptyState;
-import static com.pgloaguen.mycleanarchitectureexample.state.RemoteDataWithRefreshingState.LoadingState;
 
 /**
  * Created by paul on 26/01/2017.
@@ -50,8 +47,8 @@ public class RepoDetailsActivity extends BaseActivityWithRemoteDataWithRefreshin
         ButterKnife.bind(this);
         activityComponent().inject(this);
 
-        presenter.init(getIntent().getStringExtra(KEY_USERNAME), getIntent().getStringExtra(KEY_REPONAME));
-        presenter.init(this);
+        presenter.init(this, getIntent().getStringExtra(KEY_USERNAME), getIntent().getStringExtra(KEY_REPONAME));
+        presenter.onCreate();
     }
 
     @Override
@@ -70,23 +67,6 @@ public class RepoDetailsActivity extends BaseActivityWithRemoteDataWithRefreshin
     protected void onDestroy() {
         presenter.onDestroy();
         super.onDestroy();
-    }
-
-    @Override
-    public void update(@NonNull RemoteDataWithRefreshingState<RepoDetailsEntity> viewModel) {
-        if (viewModel instanceof EmptyState) {
-            descTextView.setText("");
-        } else if (viewModel instanceof LoadingState) {
-            descTextView.setText("Loading ...");
-        } else if (viewModel instanceof RefreshingState) {
-            descTextView.setText("Refreshing ...");
-        } else if (viewModel instanceof DisplayDataState) {
-            descTextView.setText(((DisplayDataState<RepoDetailsEntity>) viewModel).datas().desc());
-        } else if (viewModel instanceof ErrorState) {
-            descTextView.setText(((ErrorState) viewModel).error());
-        } else {
-            throw new IllegalArgumentException("Unhandle state " + viewModel);
-        }
     }
 
     @Override
