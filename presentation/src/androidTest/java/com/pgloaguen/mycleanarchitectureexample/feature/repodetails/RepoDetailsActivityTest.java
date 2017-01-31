@@ -5,7 +5,10 @@ import android.support.test.rule.UiThreadTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
+import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.BaseActivityTest;
+import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,46 +53,51 @@ public class RepoDetailsActivityTest extends BaseActivityTest {
 
     @Test
     public void stateEmpty() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(emptyState()));
+        givenUiStateIs(emptyState());
         robot.isEmptyState();
     }
 
     @Test
     public void stateLoading() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(loadingState()));
+        givenUiStateIs(loadingState());
         robot.isLoadingState();
     }
 
     @Test
     public void stateError() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(errorState("error")));
+        givenUiStateIs(errorState("error"));
         robot.isErrorState("error");
     }
 
     @Test
     public void stateData() throws Throwable {
         RepoDetailsEntity details = RepoDetailsEntity.create(0, "name", "desc");
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(displayDataState(details)));
+        givenUiStateIs(displayDataState(details));
         robot.isDisplayDataState(details);
     }
 
     @Test
     public void stateRefreshing() throws Throwable {
         RepoDetailsEntity details = RepoDetailsEntity.create(0, "name", "desc");
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(refreshingState(details)));
+        givenUiStateIs(refreshingState(details));
         robot.isRefreshingState(details);
     }
 
     @Test
     public void stateErrorWithData() throws Throwable {
         RepoDetailsEntity details = RepoDetailsEntity.create(0, "name", "desc");
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(errorWithDisplayDataState("error", details)));
+        givenUiStateIs(errorWithDisplayDataState("error", details));
         robot.isErrorStateWithData("error", details);
     }
 
     @Test
     public void stateLoadingWithError() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(loadingWithErrorState("error")));
+        givenUiStateIs(loadingWithErrorState("error"));
         robot.isLoadingWithErrorState("error");
+    }
+
+    private void givenUiStateIs(RemoteDataWithRefreshingState state) throws Throwable {
+        uiThreadTestRule.runOnUiThread(() ->
+                ((BaseFragmentWithRemoteDataWithRefreshingState) mActivityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container)).update(state));
     }
 }

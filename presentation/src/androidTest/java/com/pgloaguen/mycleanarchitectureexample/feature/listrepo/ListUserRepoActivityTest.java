@@ -5,7 +5,10 @@ import android.support.test.rule.UiThreadTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.pgloaguen.domain.entity.RepoEntity;
+import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.BaseActivityTest;
+import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,51 +55,51 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void stateEmpty() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(emptyState()));
+        givenUiStateIs(emptyState());
         listUserRepoRobot.isEmptyState();
     }
 
     @Test
     public void stateLoading() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(loadingState()));
+        givenUiStateIs(loadingState());
         listUserRepoRobot.isLoadingState();
     }
 
     @Test
     public void stateDisplayData() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc")))));
+        givenUiStateIs(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
         listUserRepoRobot.isDisplayDataState();
     }
 
     @Test
     public void stateRefreshing() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(refreshingState(Collections.singletonList(RepoEntity.create(0, "name", "desc")))));
+        givenUiStateIs(refreshingState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
         listUserRepoRobot.isRefreshingState();
     }
 
     @Test
     public void stateError() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(errorState("Error")));
+        givenUiStateIs(errorState("Error"));
         listUserRepoRobot.isErrorState();
     }
 
     @Test
     public void stateLoadingWithError() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(loadingWithErrorState("Error")));
+        givenUiStateIs(loadingWithErrorState("Error"));
         listUserRepoRobot.isLoadingWithErrorState();
     }
 
     @Test
     public void stateErrorWithData() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(errorWithDisplayDataState("Error", Collections.singletonList(RepoEntity.create(0, "name", "desc")))));
+        givenUiStateIs(errorWithDisplayDataState("Error", Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
         listUserRepoRobot.isErrorStateWithData();
     }
 
     @Test
     public void possibleToSwipeWhenStateError() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(errorState("Error")));
+        givenUiStateIs(errorState("Error"));
         doAnswer(invocation -> {
-            uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc")))));
+            givenUiStateIs(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
             return null;
         }).when(presenter).askForRefresh();
 
@@ -107,14 +110,19 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void possibleToSwipeWhenStateEmpty() throws Throwable {
-        uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(emptyState()));
+        givenUiStateIs(emptyState());
         doAnswer(invocation -> {
-            uiThreadTestRule.runOnUiThread(() -> mActivityRule.getActivity().update(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc")))));
+            givenUiStateIs(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
             return null;
         }).when(presenter).askForRefresh();
 
         listUserRepoRobot.isEmptyState();
         listUserRepoRobot.swipeRefresh();
         listUserRepoRobot.isDisplayDataState();
+    }
+
+    private void givenUiStateIs(RemoteDataWithRefreshingState state) throws Throwable {
+        uiThreadTestRule.runOnUiThread(() ->
+                ((BaseFragmentWithRemoteDataWithRefreshingState) mActivityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment)).update(state));
     }
 }

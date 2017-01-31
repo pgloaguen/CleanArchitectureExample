@@ -10,4 +10,4 @@
     android:background="@color/colorPrimary"
     app:titleTextColor="@color/colorPrimaryTextInverse"
     tools:title="Repo name"
-    tools:showIn="@layout/activity_details"/>
+    tools:showIn="@layout/fragment_details"/>
