@@ -54,19 +54,25 @@ public class RepoDetailsActivity extends BaseActivityWithRemoteDataWithRefreshin
 
     @Override
     protected void displayFirstFetchLoadingScreen() {
-        descTextView.setText("Loading ...");
+        descTextView.setText(R.string.loading);
     }
 
     @Override
     protected void displayRefreshingScreen(RefreshingState<RepoDetailsEntity> viewModel) {
-        descTextView.setText("Refreshing ...");
+        toolbar.setTitle(viewModel.datas().name());
+        descTextView.setText(R.string.refreshing);
     }
 
     @Override
-    protected void displayLoadingWithErrorScreen(LoadingWithErrorState<RepoDetailsEntity> viewModel) {}
+    protected void displayLoadingWithErrorScreen(LoadingWithErrorState<RepoDetailsEntity> viewModel) {
+        descTextView.setText(R.string.loading);
+    }
 
     @Override
-    protected void displayEmptyScreen() {}
+    protected void displayEmptyScreen() {
+        toolbar.setTitle("");
+        descTextView.setText("");
+    }
 
     @Override
     protected void displayDataScreen(DisplayDataState<RepoDetailsEntity> viewModel) {
@@ -76,7 +82,8 @@ public class RepoDetailsActivity extends BaseActivityWithRemoteDataWithRefreshin
 
     @Override
     protected void displayErrorWithDataScreen(ErrorWithDisplayDataState<RepoDetailsEntity> viewModel) {
-        descTextView.setText(viewModel.error());
+        toolbar.setTitle(viewModel.datas().name());
+        descTextView.setText(viewModel.datas().desc());
         Toast.makeText(this, viewModel.error(), Toast.LENGTH_LONG).show();
     }
 

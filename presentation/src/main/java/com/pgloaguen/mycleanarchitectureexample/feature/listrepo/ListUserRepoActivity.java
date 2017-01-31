@@ -1,12 +1,12 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
 import android.support.annotation.NonNull;
-import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +14,6 @@ import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.activity.BaseActivityWithRemoteDataWithRefreshingState;
 import com.pgloaguen.mycleanarchitectureexample.base.presenter.RemoteDataWithRefreshingStatePresenter;
-import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,11 @@ import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorState;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.RefreshingState;
 
 
 public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshingState<List<RepoEntity>>  {
@@ -45,7 +47,7 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
     RecyclerView recycler;
 
     @BindView(R.id.progress)
-    ContentLoadingProgressBar progressBar;
+    ProgressBar progressBar;
 
     @BindView(R.id.error_screen)
     View errorScreen;
@@ -74,7 +76,7 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
 
     private void hideAllProgress() {
         swipeRefreshLayout.setRefreshing(false);
-        progressBar.hide();
+        progressBar.setVisibility(GONE);
     }
 
     private void showError(String error) {
@@ -96,21 +98,21 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
 
     @Override
     protected void displayFirstFetchLoadingScreen() {
-        progressBar.show();
+        progressBar.setVisibility(VISIBLE);
         clearData();
         hideError();
     }
 
     @Override
-    protected void displayRefreshingScreen(RemoteDataWithRefreshingState.RefreshingState<List<RepoEntity>> model) {
-        if (!swipeRefreshLayout.isRefreshing()) swipeRefreshLayout.setRefreshing(true);
+    protected void displayRefreshingScreen(RefreshingState<List<RepoEntity>> model) {
+        progressBar.setVisibility(GONE);
         hideError();
         setData(model.datas());
     }
 
     @Override
     protected void displayLoadingWithErrorScreen(LoadingWithErrorState viewModel) {
-        progressBar.show();
+        progressBar.setVisibility(GONE);
         showError(viewModel.error());
         clearData();
     }
@@ -123,7 +125,7 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
     }
 
     @Override
-    protected void displayDataScreen(@NonNull RemoteDataWithRefreshingState.DisplayDataState<List<RepoEntity>> model) {
+    protected void displayDataScreen(@NonNull DisplayDataState<List<RepoEntity>> model) {
         hideAllProgress();
         hideError();
         setData(model.datas());
@@ -138,7 +140,7 @@ public class ListUserRepoActivity extends BaseActivityWithRemoteDataWithRefreshi
     }
 
     @Override
-    protected void displayErrorScreen(@NonNull RemoteDataWithRefreshingState.ErrorState model) {
+    protected void displayErrorScreen(@NonNull ErrorState model) {
         hideAllProgress();
         showError(model.error());
         clearData();

@@ -58,8 +58,15 @@ dependencies {
     testCompile junit
     testCompile mockito
 
+    androidTestCompile dagger
+    androidTestApt daggerCompiler
+    androidTestCompile junit
+    androidTestCompile mockito
 
-
+    androidTestCompile mockitoDexMaker
+    androidTestCompile(testRunner, {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
     androidTestCompile(espresso, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
