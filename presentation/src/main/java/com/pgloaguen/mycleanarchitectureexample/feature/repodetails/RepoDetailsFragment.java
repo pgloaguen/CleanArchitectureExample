@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
-import com.pgloaguen.mycleanarchitectureexample.base.presenter.RemoteDataWithRefreshingStatePresenter;
 
 import javax.inject.Inject;
 
@@ -29,7 +28,7 @@ import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWith
  * Created by paul on 26/01/2017.
  */
 
-public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshingState<RepoDetailsEntity> {
+public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshingState<RepoDetailsEntity, RepoDetailsPresenter> {
 
     private static final String KEY_USERNAME = "username";
     private static final String KEY_REPONAME = "reponame";
@@ -62,10 +61,14 @@ public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshin
     }
 
     @Override
-    protected RemoteDataWithRefreshingStatePresenter init() {
+    protected RepoDetailsPresenter createPresenter() {
         activityComponent().inject(this);
-        presenter.init(this, getArguments().getString(KEY_USERNAME), getArguments().getString(KEY_REPONAME));
         return presenter;
+    }
+
+    @Override
+    protected void init(RepoDetailsPresenter presenter) {
+        presenter.init(this, getArguments().getString(KEY_USERNAME), getArguments().getString(KEY_REPONAME));
     }
 
     @Override

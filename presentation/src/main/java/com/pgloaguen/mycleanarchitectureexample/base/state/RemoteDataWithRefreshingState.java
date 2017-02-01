@@ -4,6 +4,9 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,22 +35,40 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
     @AutoValue
     public abstract static class LoadingState<D> extends RemoteDataWithRefreshingState<D> {
+
+        public static <D> TypeAdapter<LoadingState<D>> typeAdapter(Gson gson, TypeToken<? extends LoadingState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_LoadingState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
 
     @AutoValue
     public abstract static class LoadingWithErrorState<D> extends RemoteDataWithRefreshingState<D> {
         public abstract String error();
+
+
+        public static <D>TypeAdapter<LoadingWithErrorState<D>> typeAdapter(Gson gson, TypeToken<? extends LoadingWithErrorState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_LoadingWithErrorState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
     @AutoValue
     public abstract static class RefreshingState<D> extends RemoteDataWithRefreshingState<D> {
         @NonNull
         public abstract D datas();
+
+
+        public static <D>TypeAdapter<RefreshingState<D>> typeAdapter(Gson gson, TypeToken<? extends RefreshingState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_RefreshingState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
     @AutoValue
     public abstract static class EmptyState<D> extends RemoteDataWithRefreshingState<D> {
+
+        public static <D> TypeAdapter<EmptyState<D>> typeAdapter(Gson gson, TypeToken<? extends EmptyState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_EmptyState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
 
@@ -55,12 +76,22 @@ public abstract class RemoteDataWithRefreshingState<D> {
     public abstract static class DisplayDataState<D> extends RemoteDataWithRefreshingState<D> {
         @NonNull
         public abstract D datas();
+
+
+        public static <D> TypeAdapter<DisplayDataState<D>> typeAdapter(Gson gson, TypeToken<? extends DisplayDataState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_DisplayDataState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
     @AutoValue
     public abstract static class ErrorState<D> extends RemoteDataWithRefreshingState<D> {
         @NonNull
         public abstract String error();
+
+
+        public static <D>TypeAdapter<ErrorState<D>> typeAdapter(Gson gson, TypeToken<? extends ErrorState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_ErrorState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
     @AutoValue
@@ -70,6 +101,11 @@ public abstract class RemoteDataWithRefreshingState<D> {
 
         @NonNull
         public abstract D datas();
+
+
+        public static <D>TypeAdapter<ErrorWithDisplayDataState<D>> typeAdapter(Gson gson, TypeToken<? extends ErrorWithDisplayDataState<D>> typeToken) {
+            return new AutoValue_RemoteDataWithRefreshingState_ErrorWithDisplayDataState.GsonTypeAdapter(gson, typeToken);
+        }
     }
 
     public static <D> RemoteDataWithRefreshingState<D> loadingState() {

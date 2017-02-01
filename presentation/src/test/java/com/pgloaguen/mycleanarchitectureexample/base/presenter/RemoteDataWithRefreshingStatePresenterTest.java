@@ -25,6 +25,7 @@ import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWith
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.refreshingState;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -38,6 +39,8 @@ public class RemoteDataWithRefreshingStatePresenterTest {
 
     @Mock
     PresenterListener<RemoteDataWithRefreshingState<String>> presenterListener;
+    @Mock
+    PresenterListener<RemoteDataWithRefreshingState<String>> presenterListenerBis;
 
     @Mock
     PresenterListener<RemoteDataWithRefreshingState<List<String>>> listPresenterListener;
@@ -199,6 +202,25 @@ public class RemoteDataWithRefreshingStatePresenterTest {
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
         verify(presenterListener, times(1)).update(emptyState());
+        verify(presenterListener, times(1)).update(displayDataState(answer));
+    }
+
+    @Test
+    public void stateIsRestored() {
+
+        given(useCase.execute(anyString())).willReturn(Observable.just(answer));
+        presenter.init(presenterListenerBis);
+        presenter.onCreate();
+        presenter.onStart();
+        presenter.onStop();
+        presenter.onDestroy();
+
+        presenter.init(presenterListener);
+        presenter.onCreate();
+        presenter.onStart();
+
+        verify(presenterListener, never()).update(emptyState());
+        verify(presenterListener, never()).update(loadingState());
         verify(presenterListener, times(1)).update(displayDataState(answer));
     }
 

@@ -8,7 +8,8 @@ import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefresh
 import java.util.Collection;
 
 import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DISPLAY_DATA_STATE;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
@@ -35,34 +36,46 @@ import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWith
 
 public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
 
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private Disposable disposable = Disposables.empty();
+
+    @NonNull
     private final UseCase<T, P> useCase;
 
-    private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
-    private RemoteDataWithRefreshingState<T> currentState;
+    private RemoteDataWithRefreshingState<T> currentState ;
 
-    public RemoteDataWithRefreshingStatePresenter(UseCase<T, P> useCase) {
+    private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
+    private boolean isReInit;
+
+
+    public RemoteDataWithRefreshingStatePresenter(@NonNull UseCase<T, P> useCase) {
         this.useCase = useCase;
     }
 
     public void init(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
+        isReInit = currentState != null;
         this.listener = listener;
     }
 
     public void onCreate() {
-        notify(emptyState());
+        notify(isReInit && currentState != null ? currentState : emptyState(), isReInit);
     }
 
     public void onStart() {
-        executeUseCase(currentState);
+        if (shouldExecuteUseCaseWhenOnstart(currentState)) {
+            executeUseCase(currentState);
+        }
+    }
+
+    private boolean shouldExecuteUseCaseWhenOnstart(@NonNull RemoteDataWithRefreshingState<T> currentState) {
+        int state = currentState.state();
+        return state == LOADING_STATE || state == LOADING_WITH_ERROR_STATE || state == REFRESHING_STATE || (state == EMPTY_STATE && !isReInit);
     }
 
     public void onStop() {
-        compositeDisposable.clear();
+        disposable.dispose();
     }
 
     public void onDestroy() {
-        compositeDisposable.dispose();
         this.listener = null;
     }
 
@@ -70,24 +83,28 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
         executeUseCase(currentState);
     }
 
-    public abstract Observable<T> executeUseCase(UseCase<T, P> useCase);
-
-    private void notify(RemoteDataWithRefreshingState<T> model) {
-        if (currentState == null || !currentState.equals(model)) {
+    private void notify(@NonNull RemoteDataWithRefreshingState<T> model, boolean forceUpdate) {
+        if (forceUpdate || currentState == null || !currentState.equals(model)) {
             listener.update(model);
         }
         currentState = model;
     }
 
-    private void executeUseCase(RemoteDataWithRefreshingState<T> currentState) {
+    private void notify(@NonNull RemoteDataWithRefreshingState<T> model) {
+        notify(model, false);
+    }
+
+
+    protected abstract Observable<T> executeUseCase(UseCase<T, P> useCase);
+
+    private void executeUseCase(@NonNull RemoteDataWithRefreshingState<T> currentState) {
+        disposable.dispose();
         RemoteDataWithRefreshingState<T> loadingState = getLoadingState(currentState);
-        compositeDisposable.clear();
-        compositeDisposable.add(
-                Observable.just(true)
+        disposable = Observable.just(true)
                 .flatMap(__ -> executeUseCase(useCase).map(this::getDisplayState))
                 .onErrorReturn(t -> getErrorState(loadingState, t.getMessage()))
                 .startWith(loadingState)
-                .subscribe(this::notify));
+                .subscribe(this::notify);
     }
 
     @NonNull

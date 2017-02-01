@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
-import com.pgloaguen.mycleanarchitectureexample.base.presenter.RemoteDataWithRefreshingStatePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWith
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.RefreshingState;
 
 
-public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshingState<List<RepoEntity>> {
+public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshingState<List<RepoEntity>, ListUserRepoPresenter> {
 
     @Inject
     ListUserRepoPresenter presenter;
@@ -64,26 +63,26 @@ public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshi
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
+        View v = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, v);
         toolbar.setTitle(R.string.repositories);
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new RepoAdapter();
         recycler.setAdapter(adapter);
-        adapter.setListener(presenter::onRepoClick);
-        swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
+        return v;
     }
 
     @Override
-    protected RemoteDataWithRefreshingStatePresenter init() {
+    protected ListUserRepoPresenter createPresenter() {
         activityComponent().inject(this);
-        presenter.init(this);
         return presenter;
+    }
+
+    @Override
+    protected void init(ListUserRepoPresenter presenter) {
+        presenter.init(this);
+        adapter.setListener(presenter::onRepoClick);
+        swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
     }
 
     private void hideAllProgress() {
