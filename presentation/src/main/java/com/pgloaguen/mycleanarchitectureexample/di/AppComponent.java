@@ -9,6 +9,8 @@ import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterCache;
 import com.pgloaguen.mycleanarchitectureexample.di.module.PresenterCacheModule;
 import com.pgloaguen.mycleanarchitectureexample.di.module.UseCaseModule;
 import com.pgloaguen.mycleanarchitectureexample.di.scope.AppScope;
+import com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter;
+import com.pgloaguen.mycleanarchitectureexample.feature.repodetails.RepoDetailsPresenter;
 
 import java.util.List;
 
@@ -23,5 +25,7 @@ import dagger.Component;
 public interface AppComponent {
     UseCase<List<RepoEntity>, String> provideGetUserRepoUseCase();
     UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> provideGetUserDetailsRepoUseCase();
-    PresenterCache<Object> provideRemoteDataWithRefreshingStatePresenterPresenterManager();
+
+    PresenterCache<ListUserRepoPresenter> provideListUserRepoPresenterPresenterCache();
+    PresenterCache<RepoDetailsPresenter> provideRepoDetailsPresenterPresenterCache();
 }

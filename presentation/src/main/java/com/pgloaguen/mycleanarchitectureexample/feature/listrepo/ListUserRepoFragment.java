@@ -1,5 +1,6 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,9 @@ public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshi
     @Inject
     ListUserRepoPresenter presenter;
 
+    @Inject
+    PresenterCache<ListUserRepoPresenter> presenterCache;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -60,6 +65,12 @@ public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshi
 
     private RepoAdapter adapter;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activityComponent().inject(this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,15 +83,18 @@ public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshi
         return v;
     }
 
-    @Override
+    @Override @NonNull
+    protected PresenterCache<ListUserRepoPresenter> getCache() {
+        return presenterCache;
+    }
+
+    @Override @NonNull
     protected ListUserRepoPresenter createPresenter() {
-        activityComponent().inject(this);
         return presenter;
     }
 
     @Override
-    protected void init(ListUserRepoPresenter presenter) {
-        presenter.init(this);
+    protected void init(@NonNull ListUserRepoPresenter presenter) {
         adapter.setListener(presenter::onRepoClick);
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
     }

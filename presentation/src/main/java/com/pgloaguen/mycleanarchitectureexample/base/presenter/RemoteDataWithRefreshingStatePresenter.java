@@ -41,42 +41,31 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     @NonNull
     private final UseCase<T, P> useCase;
 
-    private RemoteDataWithRefreshingState<T> currentState ;
+    private RemoteDataWithRefreshingState<T> currentState;
 
     private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
-    private boolean isReInit;
-
 
     public RemoteDataWithRefreshingStatePresenter(@NonNull UseCase<T, P> useCase) {
         this.useCase = useCase;
     }
 
-    public void init(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
-        isReInit = currentState != null;
+    public void attach(PresenterListener<RemoteDataWithRefreshingState<T>> listener) {
         this.listener = listener;
-    }
-
-    public void onCreate() {
-        notify(isReInit && currentState != null ? currentState : emptyState(), isReInit);
-    }
-
-    public void onStart() {
-        if (shouldExecuteUseCaseWhenOnstart(currentState)) {
+        if (currentState == null) {
+            notify(emptyState());
             executeUseCase(currentState);
+        } else {
+            notify(currentState, true);
         }
     }
 
-    private boolean shouldExecuteUseCaseWhenOnstart(@NonNull RemoteDataWithRefreshingState<T> currentState) {
-        int state = currentState.state();
-        return state == LOADING_STATE || state == LOADING_WITH_ERROR_STATE || state == REFRESHING_STATE || (state == EMPTY_STATE && !isReInit);
-    }
-
-    public void onStop() {
-        disposable.dispose();
-    }
-
-    public void onDestroy() {
+    public void detach() {
         this.listener = null;
+    }
+
+    public void destroy() {
+        currentState = null;
+        disposable.dispose();
     }
 
     public void askForRefresh() {
@@ -84,7 +73,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     }
 
     private void notify(@NonNull RemoteDataWithRefreshingState<T> model, boolean forceUpdate) {
-        if (forceUpdate || currentState == null || !currentState.equals(model)) {
+        if (listener != null && (forceUpdate || currentState == null || !currentState.equals(model))) {
             listener.update(model);
         }
         currentState = model;
@@ -93,7 +82,6 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     private void notify(@NonNull RemoteDataWithRefreshingState<T> model) {
         notify(model, false);
     }
-
 
     protected abstract Observable<T> executeUseCase(UseCase<T, P> useCase);
 

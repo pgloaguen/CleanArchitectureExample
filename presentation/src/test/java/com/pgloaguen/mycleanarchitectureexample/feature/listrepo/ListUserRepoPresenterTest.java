@@ -49,7 +49,7 @@ public class ListUserRepoPresenterTest {
 
     @Test
     public void presenterDisplayDetailsWhenRepoClick() {
-        presenter.init(presenterListener);
+        presenter.attach(presenterListener);
 
         presenter.onRepoClick(answer.get(0));
         verify(navigator).showRepoDetails("pgloaguen", answer.get(0).name());

@@ -1,6 +1,8 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.repodetails;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterCache;
 
 import javax.inject.Inject;
 
@@ -36,6 +39,9 @@ public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshin
     @Inject
     RepoDetailsPresenter presenter;
 
+    @Inject
+    PresenterCache<RepoDetailsPresenter> presenterCache;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -52,6 +58,12 @@ public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshin
         return fragment;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activityComponent().inject(this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -60,15 +72,19 @@ public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshin
         return v;
     }
 
-    @Override
+    @Override @NonNull
+    protected PresenterCache<RepoDetailsPresenter> getCache() {
+        return presenterCache;
+    }
+
+    @Override @NonNull
     protected RepoDetailsPresenter createPresenter() {
-        activityComponent().inject(this);
         return presenter;
     }
 
     @Override
-    protected void init(RepoDetailsPresenter presenter) {
-        presenter.init(this, getArguments().getString(KEY_USERNAME), getArguments().getString(KEY_REPONAME));
+    protected void init(@NonNull RepoDetailsPresenter presenter) {
+        presenter.init(getArguments().getString(KEY_USERNAME), getArguments().getString(KEY_REPONAME));
     }
 
     @Override

@@ -10,8 +10,6 @@ import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterListener
 import com.pgloaguen.mycleanarchitectureexample.base.presenter.RemoteDataWithRefreshingStatePresenter;
 import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
-import javax.inject.Inject;
-
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DISPLAY_DATA_STATE;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
 import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.EMPTY_STATE;
@@ -29,36 +27,28 @@ import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWith
  * Created by paul on 27/01/2017.
  */
 
-public abstract class BaseFragmentWithRemoteDataWithRefreshingState<S, P extends RemoteDataWithRefreshingStatePresenter>
+public abstract class BaseFragmentWithRemoteDataWithRefreshingState<S, P extends RemoteDataWithRefreshingStatePresenter<S, ?>>
         extends BaseFragment implements PresenterListener<RemoteDataWithRefreshingState<S>> {
 
     private static final String KEY_PRESENTER = "key_presenter";
 
     private P presenter;
 
-    public static class APresenterCache {
-        @Inject
-        PresenterCache<Object> cache;
-    }
-
-    private final APresenterCache aPresenterCache = new APresenterCache();
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         if (getActivity().isFinishing() || !isRemoving()) {
-            outState.putString(KEY_PRESENTER, aPresenterCache.cache.storePresenter(presenter));
+            outState.putString(KEY_PRESENTER, getCache().storePresenter(presenter));
         }
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        activityComponent().inject(aPresenterCache);
 
         if (savedInstanceState != null) {
-            presenter = ((P) aPresenterCache.cache.getPresenter(savedInstanceState.getString(KEY_PRESENTER, "")));
+            presenter = getCache().getPresenter(savedInstanceState.getString(KEY_PRESENTER, ""));
         }
 
         if (presenter == null) {
@@ -66,31 +56,36 @@ public abstract class BaseFragmentWithRemoteDataWithRefreshingState<S, P extends
         }
 
         init(presenter);
-        presenter.onCreate();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        presenter.onStart();
+        presenter.attach(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        presenter.onStop();
+        presenter.detach();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.onDestroy();
+        if (getActivity().isFinishing() || isRemoving()) {
+            presenter.destroy();
+        }
         presenter = null;
     }
 
+    @NonNull
+    protected abstract PresenterCache<P> getCache();
+
+    @NonNull
     protected abstract P createPresenter();
 
-    protected abstract void init(P presenter);
+    protected abstract void init(@NonNull P presenter);
 
     @Override
     public void update(@NonNull RemoteDataWithRefreshingState<S> viewModel) {

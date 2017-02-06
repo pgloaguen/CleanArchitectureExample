@@ -82,9 +82,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
 
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
 
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
 
 
         verify(presenterListener, times(1)).update(emptyState());
@@ -97,9 +95,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
 
         given(listUseCase.execute(anyString())).willReturn(Observable.just(Collections.emptyList()));
 
-        listPresenter.init(listPresenterListener);
-        listPresenter.onCreate();
-        listPresenter.onStart();
+        listPresenter.attach(listPresenterListener);
 
 
         verify(listPresenterListener, times(2)).update(emptyState());
@@ -110,9 +106,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void initErrorCase() {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
 
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
 
         verify(presenterListener, times(1)).update(emptyState());
         verify(presenterListener, times(1)).update(loadingState());
@@ -123,9 +117,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void initAndRefreshHappyCase() {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
 
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
         presenter.askForRefresh();
 
         verify(presenterListener, times(1)).update(emptyState());
@@ -137,9 +129,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     @Test
     public void initHappyCaseRefreshErrorCase() {
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
 
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
         presenter.askForRefresh();
@@ -156,9 +146,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     @Test
     public void initErrorThenRefreshHappyCase() {
         given(useCase.execute(anyString())).willReturn(Observable.error(errorAnswer));
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
 
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
         presenter.askForRefresh();
@@ -174,9 +162,7 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void onlyOneRequestAtATime() {
         TestScheduler testScheduler = new TestScheduler();
         given(useCase.execute(anyString())).willReturn(Observable.just(answer).delay(10, TimeUnit.SECONDS, testScheduler));
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
         presenter.askForRefresh();
         presenter.askForRefresh();
 
@@ -192,13 +178,10 @@ public class RemoteDataWithRefreshingStatePresenterTest {
 
         TestScheduler testScheduler = new TestScheduler();
         given(useCase.execute(anyString())).willReturn(Observable.just(answer).delay(10, TimeUnit.SECONDS, testScheduler));
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
         presenter.askForRefresh();
-        presenter.onStop();
-        presenter.onDestroy();
+        presenter.detach();
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
         verify(presenterListener, times(1)).update(emptyState());
@@ -209,15 +192,10 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void stateIsRestored() {
 
         given(useCase.execute(anyString())).willReturn(Observable.just(answer));
-        presenter.init(presenterListenerBis);
-        presenter.onCreate();
-        presenter.onStart();
-        presenter.onStop();
-        presenter.onDestroy();
+        presenter.attach(presenterListenerBis);
+        presenter.detach();
 
-        presenter.init(presenterListener);
-        presenter.onCreate();
-        presenter.onStart();
+        presenter.attach(presenterListener);
 
         verify(presenterListener, never()).update(emptyState());
         verify(presenterListener, never()).update(loadingState());

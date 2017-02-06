@@ -1,6 +1,5 @@
 package com.pgloaguen.mycleanarchitectureexample.di;
 
-import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
 import com.pgloaguen.mycleanarchitectureexample.di.module.ActivityModule;
 import com.pgloaguen.mycleanarchitectureexample.di.scope.ActivityScope;
 import com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoActivity;
@@ -21,5 +20,4 @@ public interface ActivityComponent {
     void inject(RepoDetailsActivity activity);
     void inject(ListUserRepoFragment listUserRepoFragment);
     void inject(RepoDetailsFragment repoDetailsFragment);
-    void inject(BaseFragmentWithRemoteDataWithRefreshingState.APresenterCache aPresenterCache);
 }

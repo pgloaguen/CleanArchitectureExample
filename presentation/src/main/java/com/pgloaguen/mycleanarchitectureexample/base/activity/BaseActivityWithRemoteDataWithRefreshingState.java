@@ -32,26 +32,26 @@ public abstract class BaseActivityWithRemoteDataWithRefreshingState<S> extends B
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = init();
-        presenter.onCreate();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        presenter.onStart();
+        presenter = init();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        presenter.onStop();
+        presenter.detach();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.onDestroy();
+        if (isFinishing()) {
+            presenter.destroy();
+        }
         presenter = null;
     }
 
