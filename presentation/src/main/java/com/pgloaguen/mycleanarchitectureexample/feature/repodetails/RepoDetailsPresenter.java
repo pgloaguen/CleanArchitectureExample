@@ -29,7 +29,7 @@ public class RepoDetailsPresenter extends RemoteDataWithRefreshingStatePresenter
     }
 
     @Override
-    public Observable<RepoDetailsEntity> executeUseCase(UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> useCase) {
-        return useCase.execute(GetUserRepoDetailsUseCase.Param.create(username, repoName)).startWith(RepoDetailsEntity.create(0, repoName, ""));
+    public Observable<RepoDetailsEntity> executeUseCase(UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> useCase, boolean invalidateData) {
+        return useCase.execute(GetUserRepoDetailsUseCase.Param.create(username, repoName, invalidateData)).startWith(RepoDetailsEntity.create(0, repoName, ""));
     }
 }

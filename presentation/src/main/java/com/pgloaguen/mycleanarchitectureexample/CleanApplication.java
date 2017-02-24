@@ -3,6 +3,7 @@ package com.pgloaguen.mycleanarchitectureexample;
 import android.app.Application;
 import android.support.annotation.VisibleForTesting;
 
+import com.pgloaguen.data.di.CacheModule;
 import com.pgloaguen.data.di.DaggerDataComponent;
 import com.pgloaguen.data.di.NetModule;
 import com.pgloaguen.data.di.RepositoryModule;
@@ -27,6 +28,7 @@ public class CleanApplication extends Application {
                 .dataComponent(
                         DaggerDataComponent
                                 .builder()
+                                .cacheModule(new CacheModule(getApplicationContext()))
                                 .netModule(new NetModule(getApplicationContext()))
                                 .repositoryModule(new RepositoryModule())
                                 .build())

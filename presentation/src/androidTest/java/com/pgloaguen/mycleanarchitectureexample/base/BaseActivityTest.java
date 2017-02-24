@@ -3,6 +3,7 @@ package com.pgloaguen.mycleanarchitectureexample.base;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 
+import com.pgloaguen.data.di.CacheModule;
 import com.pgloaguen.data.di.DaggerDataComponent;
 import com.pgloaguen.data.di.NetModule;
 import com.pgloaguen.data.di.RepositoryModule;
@@ -39,6 +40,7 @@ public class BaseActivityTest {
                 .dataComponent(
                         DaggerDataComponent
                                 .builder()
+                                .cacheModule(new CacheModule(InstrumentationRegistry.getTargetContext()))
                                 .netModule(new NetModule(InstrumentationRegistry.getTargetContext()))
                                 .repositoryModule(new RepositoryModule())
                                 .build())

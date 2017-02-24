@@ -1,5 +1,7 @@
 package com.pgloaguen.data.repository;
 
+import com.pgloaguen.data.cache.Cache;
+import com.pgloaguen.data.cache.NoCache;
 import com.pgloaguen.data.model.Repo;
 import com.pgloaguen.data.net.GetUserRepoEndpoint;
 import com.pgloaguen.data.net.utils.ConnectionUtils;
@@ -14,7 +16,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 
@@ -43,6 +44,8 @@ public class GetUserRepoEndpointTest {
     @Mock
     ConnectionUtils connectionUtils;
 
+    Cache<Repo> cache = new NoCache<>();
+
     @Test
     public void listUserRepo() throws Exception {
 
@@ -50,10 +53,9 @@ public class GetUserRepoEndpointTest {
         given(transformer.transform(any())).willReturn(mock(RepoEntity.class));
         given(connectionUtils.isConnected()).willReturn(true);
 
-        Observable<List<RepoEntity>> o = new GetUserRepoRepositoryImpl(userRepoWS, transformer, connectionUtils).listUserRepo("");
+        Single<List<RepoEntity>> o = new GetUserRepoRepositoryImpl(userRepoWS, transformer, cache, connectionUtils).fetchUserRepo("");
         o.subscribe(consumer);
 
         verify(consumer).accept(anyList());
     }
-
 }

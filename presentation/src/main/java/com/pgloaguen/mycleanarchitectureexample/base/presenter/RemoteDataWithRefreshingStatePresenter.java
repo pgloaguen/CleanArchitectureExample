@@ -53,7 +53,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
         this.listener = listener;
         if (currentState == null) {
             notify(emptyState());
-            executeUseCase(currentState);
+            executeUseCase(currentState, false);
         } else {
             notify(currentState, true);
         }
@@ -69,7 +69,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     }
 
     public void askForRefresh() {
-        executeUseCase(currentState);
+        executeUseCase(currentState, true);
     }
 
     private void notify(@NonNull RemoteDataWithRefreshingState<T> model, boolean forceUpdate) {
@@ -83,13 +83,13 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
         notify(model, false);
     }
 
-    protected abstract Observable<T> executeUseCase(UseCase<T, P> useCase);
+    protected abstract Observable<T> executeUseCase(UseCase<T, P> useCase, boolean invalidateData);
 
-    private void executeUseCase(@NonNull RemoteDataWithRefreshingState<T> currentState) {
+    private void executeUseCase(@NonNull RemoteDataWithRefreshingState<T> currentState, boolean invalidateData) {
         disposable.dispose();
         RemoteDataWithRefreshingState<T> loadingState = getLoadingState(currentState);
         disposable = Observable.just(true)
-                .flatMap(__ -> executeUseCase(useCase).map(this::getDisplayState))
+                .flatMap(__ -> executeUseCase(useCase, invalidateData).map(this::getDisplayState))
                 .onErrorReturn(t -> getErrorState(loadingState, t.getMessage()))
                 .startWith(loadingState)
                 .subscribe(this::notify);

@@ -24,16 +24,17 @@ public class GetUserRepoDetailsUseCase extends UseCase<RepoDetailsEntity, GetUse
 
     @Override
     protected Observable<RepoDetailsEntity> build(Param param) {
-        return repository.fetchUserRepoDetails(param.username(), param.repoName());
+        return repository.fetchUserRepoDetails(param.username(), param.repoName()).toObservable();
     }
 
     @AutoValue
     public static abstract class Param {
         public abstract String username();
         public abstract String repoName();
+        public abstract boolean invalidateData();
 
-        public static Param create(String username, String repoName) {
-            return new AutoValue_GetUserRepoDetailsUseCase_Param(username, repoName);
+        public static Param create(String username, String repoName, boolean invalidateData) {
+            return new AutoValue_GetUserRepoDetailsUseCase_Param(username, repoName, invalidateData);
         }
     }
 }

@@ -4,9 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import com.pgloaguen.data.model.GitHubAdapterFactory;
 import com.pgloaguen.data.net.utils.ConnectionUtils;
 
 import javax.inject.Named;
@@ -51,12 +49,6 @@ public class NetModule {
     @Provides
     public OkHttpClient okHttpClient(HttpLoggingInterceptor interceptor) {
         return new OkHttpClient.Builder().addInterceptor(interceptor).build();
-    }
-
-    @Singleton
-    @Provides
-    public Gson gsonBuilder() {
-        return new GsonBuilder().registerTypeAdapterFactory(GitHubAdapterFactory.create()).create();
     }
 
     @Singleton

@@ -2,6 +2,7 @@ package com.pgloaguen.data.net;
 
 import android.content.Context;
 
+import com.pgloaguen.data.di.CacheModule;
 import com.pgloaguen.data.di.DaggerDataComponentTest;
 import com.pgloaguen.data.di.NetModule;
 import com.pgloaguen.data.di.RepositoryModule;
@@ -30,7 +31,7 @@ public class GetUserRepoWsTest {
 
     @Test
     public void getUserRepoWsWorks() {
-        DaggerDataComponentTest.builder().netModule(new NetModule(context)).repositoryModule(new RepositoryModule()).build().inject(this);
+        DaggerDataComponentTest.builder().cacheModule(new CacheModule(context)).netModule(new NetModule(context)).repositoryModule(new RepositoryModule()).build().inject(this);
 
         retrofit.create(GetUserRepoEndpoint.class).list("pgloaguen").test().assertNoErrors();
     }

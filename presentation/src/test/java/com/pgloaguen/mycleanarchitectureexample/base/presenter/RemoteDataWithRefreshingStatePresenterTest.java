@@ -62,14 +62,14 @@ public class RemoteDataWithRefreshingStatePresenterTest {
     public void setup() {
         presenter = new RemoteDataWithRefreshingStatePresenter<String, String>(useCase) {
             @Override
-            public Observable<String> executeUseCase(UseCase<String, String> useCase) {
+            public Observable<String> executeUseCase(UseCase<String, String> useCase, boolean invalidate) {
                 return useCase.execute("");
             }
         };
 
         listPresenter = new RemoteDataWithRefreshingStatePresenter<List<String>, String>(listUseCase) {
             @Override
-            public Observable<List<String>> executeUseCase(UseCase<List<String>, String> useCase) {
+            public Observable<List<String>> executeUseCase(UseCase<List<String>, String> useCase, boolean invalidate) {
                 return useCase.execute("");
             }
         };

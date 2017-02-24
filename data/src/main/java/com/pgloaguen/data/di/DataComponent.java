@@ -12,7 +12,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {NetModule.class, RepositoryModule.class})
+@Component(modules = {ParserModule.class, CacheModule.class, NetModule.class, RepositoryModule.class})
 public interface DataComponent {
     GetUserRepoRepository getUserRepoRepository();
     GetUserRepoDetailsRepository getUserRepoDetailsRepository();

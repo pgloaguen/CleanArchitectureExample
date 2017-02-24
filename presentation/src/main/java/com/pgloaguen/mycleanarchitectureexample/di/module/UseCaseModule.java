@@ -25,7 +25,7 @@ public class UseCaseModule {
 
     @AppScope
     @Provides
-    public UseCase<List<RepoEntity>, String> provideGetUserRepo(GetUserRepoRepository repository) {
+    public UseCase<List<RepoEntity>, GetUserRepoUseCase.Param> provideGetUserRepo(GetUserRepoRepository repository) {
         return new GetUserRepoUseCase(repository, Schedulers.io(), AndroidSchedulers.mainThread());
     }
 

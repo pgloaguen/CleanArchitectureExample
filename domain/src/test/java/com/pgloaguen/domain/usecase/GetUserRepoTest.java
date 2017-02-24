@@ -11,10 +11,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.observers.TestObserver;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -41,20 +40,56 @@ public class GetUserRepoTest {
     @Test
     public void getUserRepoUseCaseHappyCase() throws Exception {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
-        given(repository.listUserRepo(anyString())).willReturn(Observable.just(values));
+        List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
 
-        TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
-        testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
-        testObserver.assertValue(repoEntities -> !repoEntities.isEmpty());
+        userRepo.execute(GetUserRepoUseCase.Param.create("", false)).test()
+                .await()
+                .assertValue(repoEntities -> repoEntities == lastValues);
     }
 
     @Test
-    public void getUserRepoUseCaseExceptionThrown() throws Exception {
-        given(repository.listUserRepo(anyString())).willReturn(Observable.error(new NullPointerException("null")));
+    public void getUserRepoUseCaseExceptionThrownSwitchToFetchFreshData() throws Exception {
+        List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.error(new NullPointerException("null")));
 
-        TestObserver<List<RepoEntity>> testObserver = userRepo.execute("").test();
-        testObserver.awaitTerminalEvent(500, TimeUnit.MILLISECONDS);
-        testObserver.assertError(NullPointerException.class).assertNoValues();
+        userRepo.execute(GetUserRepoUseCase.Param.create("", false))
+                .test()
+                .await()
+                .assertValue(repoEntities -> repoEntities == values);
     }
 
+    @Test
+    public void getUserRepoUseCaseEmptySwitchToFetchFreshData() throws Exception {
+        List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.empty());
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+
+        userRepo.execute(GetUserRepoUseCase.Param.create("", false)).test()
+                .await()
+                .assertValue(repoEntities -> repoEntities == values);
+    }
+
+    @Test
+    public void getUserRepoUseCaseForceUpdateHappyCase() throws Exception {
+        List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+
+        userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
+                .await()
+                .assertValue(repoEntities -> repoEntities == values);
+    }
+
+    @Test
+    public void getUserRepoUseCaseForceUpdateError() throws Exception {
+        List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.error(new NullPointerException("null")));
+        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
+
+        userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
+                .await()
+                .assertError(NullPointerException.class);
+    }
 }

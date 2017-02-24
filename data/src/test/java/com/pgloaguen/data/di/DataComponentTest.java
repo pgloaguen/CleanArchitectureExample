@@ -12,7 +12,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {NetModule.class, RepositoryModule.class})
+@Component(modules = {ParserModule.class, CacheModule.class, NetModule.class, RepositoryModule.class})
 public interface DataComponentTest extends DataComponent {
     void inject(GetUserRepoWsTest getUserRepoWsTest);
     void inject(GetUserRepoDetailsWsTest getUserRepoDetailsWsTest);

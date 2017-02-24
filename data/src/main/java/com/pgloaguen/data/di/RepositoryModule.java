@@ -1,18 +1,16 @@
 package com.pgloaguen.data.di;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-
+import com.pgloaguen.data.cache.CacheFactory;
+import com.pgloaguen.data.model.Repo;
 import com.pgloaguen.data.net.GetUserRepoDetailsEndpoint;
+import com.pgloaguen.data.net.GetUserRepoEndpoint;
 import com.pgloaguen.data.net.utils.ConnectionUtils;
 import com.pgloaguen.data.repository.GetUserRepoDetailsRepositoryImpl;
-import com.pgloaguen.data.net.GetUserRepoEndpoint;
 import com.pgloaguen.data.repository.GetUserRepoRepositoryImpl;
 import com.pgloaguen.data.transformer.RepoDetailsEntityTransformer;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
-
 
 import javax.inject.Singleton;
 
@@ -29,13 +27,20 @@ public class RepositoryModule {
 
     @Provides
     @Singleton
-    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit, ConnectionUtils connectionUtils) {
-        return new GetUserRepoRepositoryImpl(retrofit.create(GetUserRepoEndpoint.class), new RepoEntityTransformer(), connectionUtils);
+    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit, ConnectionUtils connectionUtils, CacheFactory cacheFactory) {
+        return new GetUserRepoRepositoryImpl(
+                retrofit.create(GetUserRepoEndpoint.class),
+                new RepoEntityTransformer(),
+                cacheFactory.buildCache(Repo.class),
+                connectionUtils);
     }
 
     @Provides
     @Singleton
     public GetUserRepoDetailsRepository buildGetUserRepoDetailsRepository(Retrofit retrofit, ConnectionUtils connectionUtils) {
-        return new GetUserRepoDetailsRepositoryImpl(retrofit.create(GetUserRepoDetailsEndpoint.class), new RepoDetailsEntityTransformer(), connectionUtils);
+        return new GetUserRepoDetailsRepositoryImpl(
+                retrofit.create(GetUserRepoDetailsEndpoint.class),
+                new RepoDetailsEntityTransformer(),
+                connectionUtils);
     }
 }

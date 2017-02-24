@@ -5,6 +5,7 @@ import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
 import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
+import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.di.scope.AppScope;
 
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.mock;
 public class MockUseCaseModule {
     @AppScope
     @Provides
-    public UseCase<List<RepoEntity>, String> provideGetUserRepo(GetUserRepoRepository repository) {
+    public UseCase<List<RepoEntity>, GetUserRepoUseCase.Param> provideGetUserRepo(GetUserRepoRepository repository) {
         return mock(UseCase.class);
     }
 

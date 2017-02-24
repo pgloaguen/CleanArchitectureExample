@@ -11,6 +11,7 @@ import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * Created by paul on 19/01/2017.
@@ -30,11 +31,11 @@ public class GetUserRepoDetailsRepositoryImpl implements GetUserRepoDetailsRepos
     }
 
     @Override
-    public Observable<RepoDetailsEntity> fetchUserRepoDetails(String user, String repoName) {
-        return  Observable.just(true)
+    public Single<RepoDetailsEntity> fetchUserRepoDetails(String user, String repoName) {
+        return Observable.just(true)
                 .compose(new ConnectionFilter<>(connectionUtils))
-                .flatMap(b -> userRepoWS.fetch(user, repoName)
+                .flatMapSingle(b -> userRepoWS.fetch(user, repoName))
                 .map(repoEntityTransformer::transform)
-                .flatMapObservable(Observable::just));
+                .firstOrError();
     }
 }
