@@ -2,8 +2,10 @@ package com.pgloaguen.mycleanarchitectureexample.di.module;
 
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.entity.RepoEntity;
+import com.pgloaguen.domain.repository.FavoriteRepoRepository;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
+import com.pgloaguen.domain.usecase.FavoriteRepo;
 import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
 import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.domain.usecase.base.UseCase;
@@ -33,6 +35,12 @@ public class UseCaseModule {
     @Provides
     public UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> provideGetUserRepoDetails(GetUserRepoDetailsRepository repository) {
         return new GetUserRepoDetailsUseCase(repository, Schedulers.io(), AndroidSchedulers.mainThread());
+    }
+
+    @AppScope
+    @Provides
+    public FavoriteRepo provideFavoriteRepoUseCase(FavoriteRepoRepository repository) {
+        return new FavoriteRepo(repository, Schedulers.io(), AndroidSchedulers.mainThread());
     }
 
 }

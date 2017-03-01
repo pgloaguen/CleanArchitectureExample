@@ -7,10 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.domain.entity.RepoEntity;
+import com.pgloaguen.mycleanarchitectureexample.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +40,15 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         RepoEntity repoEntity = data.get(position);
         holder.name.setText(repoEntity.name());
         holder.desc.setText(repoEntity.desc());
+        holder.favorite.setText(repoEntity.isFavorite() ? "Unfavorite" : "Favorite");
         holder.itemView.setOnClickListener(__ -> {
             if(listener != null) {
                 listener.onRepoClick(repoEntity);
+            }
+        });
+        holder.favorite.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRepoFavorite(repoEntity);
             }
         });
     }
@@ -90,6 +97,9 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         @BindView(R.id.desc)
         TextView desc;
 
+        @BindView(R.id.btn_favorite)
+        Button favorite;
+
         public VH(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -98,5 +108,6 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
 
     public interface OnRepoClick {
         void onRepoClick(RepoEntity repoEntity);
+        void onRepoFavorite(RepoEntity repoEntity);
     }
 }

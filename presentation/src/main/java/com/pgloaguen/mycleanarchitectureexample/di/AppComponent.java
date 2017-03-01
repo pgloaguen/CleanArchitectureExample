@@ -3,6 +3,7 @@ package com.pgloaguen.mycleanarchitectureexample.di;
 import com.pgloaguen.data.di.DataComponent;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.entity.RepoEntity;
+import com.pgloaguen.domain.usecase.FavoriteRepo;
 import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
 import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.domain.usecase.base.UseCase;
@@ -26,7 +27,8 @@ import dagger.Component;
 public interface AppComponent {
     UseCase<List<RepoEntity>, GetUserRepoUseCase.Param> provideGetUserRepoUseCase();
     UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> provideGetUserDetailsRepoUseCase();
+    FavoriteRepo provideFavoriteRepoUseCase();
 
-    PresenterCache<ListUserRepoPresenter> provideListUserRepoPresenterPresenterCache();
+    PresenterCache<ListUserRepoPresenter> provideListUserRepoPresenterPresenter2Cache();
     PresenterCache<RepoDetailsPresenter> provideRepoDetailsPresenterPresenterCache();
 }

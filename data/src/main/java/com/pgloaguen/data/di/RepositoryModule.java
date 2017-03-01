@@ -5,10 +5,12 @@ import com.pgloaguen.data.model.Repo;
 import com.pgloaguen.data.net.GetUserRepoDetailsEndpoint;
 import com.pgloaguen.data.net.GetUserRepoEndpoint;
 import com.pgloaguen.data.net.utils.ConnectionUtils;
+import com.pgloaguen.data.repository.FavoriteRepoImpl;
 import com.pgloaguen.data.repository.GetUserRepoDetailsRepositoryImpl;
 import com.pgloaguen.data.repository.GetUserRepoRepositoryImpl;
 import com.pgloaguen.data.transformer.RepoDetailsEntityTransformer;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
+import com.pgloaguen.domain.repository.FavoriteRepoRepository;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
 
@@ -27,20 +29,28 @@ public class RepositoryModule {
 
     @Provides
     @Singleton
-    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit, ConnectionUtils connectionUtils, CacheFactory cacheFactory) {
+    public GetUserRepoRepository buildGetUserRepoRepository(Retrofit retrofit, ConnectionUtils connectionUtils, CacheFactory cacheFactory, FavoriteRepoRepository favoriteRepoRepository) {
         return new GetUserRepoRepositoryImpl(
                 retrofit.create(GetUserRepoEndpoint.class),
                 new RepoEntityTransformer(),
                 cacheFactory.buildCache(Repo.class),
-                connectionUtils);
+                connectionUtils,
+                favoriteRepoRepository);
     }
 
     @Provides
     @Singleton
-    public GetUserRepoDetailsRepository buildGetUserRepoDetailsRepository(Retrofit retrofit, ConnectionUtils connectionUtils) {
+    public GetUserRepoDetailsRepository buildGetUserRepoDetailsRepository(Retrofit retrofit, ConnectionUtils connectionUtils, FavoriteRepoRepository favoriteRepoRepository) {
         return new GetUserRepoDetailsRepositoryImpl(
                 retrofit.create(GetUserRepoDetailsEndpoint.class),
                 new RepoDetailsEntityTransformer(),
-                connectionUtils);
+                connectionUtils,
+                favoriteRepoRepository);
+    }
+
+    @Provides
+    @Singleton
+    public FavoriteRepoRepository buildFavoriteRepoRepository(CacheFactory cacheFactory) {
+        return new FavoriteRepoImpl(cacheFactory.buildCache(Boolean.class));
     }
 }

@@ -86,7 +86,6 @@ public class GetUserRepoTest {
     public void getUserRepoUseCaseForceUpdateError() throws Exception {
         List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.error(new NullPointerException("null")));
-        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
 
         userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
                 .await()

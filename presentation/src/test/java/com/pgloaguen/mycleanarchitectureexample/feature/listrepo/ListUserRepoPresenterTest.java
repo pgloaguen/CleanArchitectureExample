@@ -43,7 +43,7 @@ public class ListUserRepoPresenterTest {
     @Before
     public void setup() {
         answer = new ArrayList<>();
-        answer.add(RepoEntity.create(1, "name", "desc"));
+        answer.add(RepoEntity.create(1, "name", "desc", false));
         errorAnswer = new NullPointerException("null");
     }
 

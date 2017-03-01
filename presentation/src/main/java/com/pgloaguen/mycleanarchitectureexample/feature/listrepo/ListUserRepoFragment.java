@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
-import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithPresenterCache;
 import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterCache;
 
 import java.util.ArrayList;
@@ -30,14 +30,9 @@ import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.RefreshingState;
 
 
-public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshingState<List<RepoEntity>, ListUserRepoPresenter> {
+public class ListUserRepoFragment extends BaseFragmentWithPresenterCache<ListUserRepoPresenter> implements ListUserRepoView {
 
     @Inject
     ListUserRepoPresenter presenter;
@@ -83,20 +78,39 @@ public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshi
         return v;
     }
 
-    @Override @NonNull
+    @NonNull
+    @Override
     protected PresenterCache<ListUserRepoPresenter> getCache() {
         return presenterCache;
     }
 
-    @Override @NonNull
+    @NonNull
+    @Override
     protected ListUserRepoPresenter createPresenter() {
         return presenter;
     }
 
     @Override
     protected void init(@NonNull ListUserRepoPresenter presenter) {
-        adapter.setListener(presenter::onRepoClick);
+        presenter.attach(this);
+        adapter.setListener(new RepoAdapter.OnRepoClick() {
+            @Override
+            public void onRepoClick(RepoEntity repoEntity) {
+                presenter.onRepoClick(repoEntity);
+            }
+
+            @Override
+            public void onRepoFavorite(RepoEntity repoEntity) {
+
+            }
+        });
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
+    }
+
+    @Override
+    public void onDestroyView() {
+        presenter.detach();
+        super.onDestroyView();
     }
 
     private void hideAllProgress() {
@@ -121,53 +135,73 @@ public class ListUserRepoFragment extends BaseFragmentWithRemoteDataWithRefreshi
         adapter.setData(repoEntities);
     }
 
-    @Override
     protected void displayFirstFetchLoadingScreen() {
         progressBar.setVisibility(VISIBLE);
         clearData();
         hideError();
     }
 
-    @Override
-    protected void displayRefreshingScreen(RefreshingState<List<RepoEntity>> model) {
+    protected void displayRefreshingScreen(List<RepoEntity> repos) {
         progressBar.setVisibility(GONE);
         hideError();
-        setData(model.datas());
+        setData(repos);
     }
 
-    @Override
-    protected void displayLoadingWithErrorScreen(LoadingWithErrorState viewModel) {
+    protected void displayLoadingWithErrorScreen(@NonNull String error) {
         progressBar.setVisibility(GONE);
-        showError(viewModel.error());
+        showError(error);
         clearData();
     }
 
-    @Override
     protected void displayEmptyScreen() {
         hideAllProgress();
         hideError();
         clearData();
     }
 
-    @Override
-    protected void displayDataScreen(@NonNull DisplayDataState<List<RepoEntity>> model) {
+    protected void displayDataScreen(@NonNull List<RepoEntity> repos) {
         hideAllProgress();
         hideError();
-        setData(model.datas());
+        setData(repos);
     }
 
-    @Override
-    protected void displayErrorWithDataScreen(ErrorWithDisplayDataState<List<RepoEntity>> model) {
+    protected void displayErrorWithDataScreen(@NonNull List<RepoEntity> repos, @NonNull String errorMessage) {
         hideAllProgress();
         hideError();
-        setData(model.datas());
-        Toast.makeText(getActivity(), model.error(), Toast.LENGTH_LONG).show();
+        setData(repos);
+        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    protected void displayErrorScreen(@NonNull ErrorState model) {
+    protected void displayErrorScreen(@NonNull String errorMessage) {
         hideAllProgress();
-        showError(model.error());
+        showError(errorMessage);
         clearData();
+    }
+
+    @Override
+    public void notify(ListUserRepoPresenter.StateValue state, ListUserRepoPresenter.ListUserRepoViewModel model) {
+        switch (state) {
+            case SHOW_EMPTY:
+                displayEmptyScreen();
+                break;
+            case SHOW_LOADING:
+                displayFirstFetchLoadingScreen();
+                break;
+            case SHOW_REFRESHING:
+                displayRefreshingScreen(model.repoEntities);
+                break;
+            case SHOW_LOADING_WITH_ERROR:
+                displayLoadingWithErrorScreen(model.error.getMessage());
+                break;
+            case SHOW_DATA:
+                displayDataScreen(model.repoEntities);
+                break;
+            case SHOW_DATA_WITH_ERROR:
+                displayErrorWithDataScreen(model.repoEntities, model.error.getMessage());
+                break;
+            case SHOW_ERROR:
+                displayErrorScreen(model.error.getMessage());
+                break;
+        }
     }
 }

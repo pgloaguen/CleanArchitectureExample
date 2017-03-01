@@ -4,6 +4,7 @@ import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
+import com.pgloaguen.domain.usecase.FavoriteRepo;
 import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
 import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
 import com.pgloaguen.domain.usecase.base.UseCase;
@@ -28,5 +29,11 @@ public class MockUseCaseModule {
     @Provides
     public UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> provideGetUserRepoDetails(GetUserRepoDetailsRepository repository) {
         return mock(UseCase.class);
+    }
+
+    @AppScope
+    @Provides
+    public FavoriteRepo provideFavoriteRepo() {
+        return mock(FavoriteRepo.class);
     }
 }

@@ -41,7 +41,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
     @NonNull
     private final UseCase<T, P> useCase;
 
-    private RemoteDataWithRefreshingState<T> currentState;
+    protected RemoteDataWithRefreshingState<T> currentState;
 
     private PresenterListener<RemoteDataWithRefreshingState<T>> listener;
 
@@ -79,7 +79,7 @@ public abstract class RemoteDataWithRefreshingStatePresenter<T, P> {
         currentState = model;
     }
 
-    private void notify(@NonNull RemoteDataWithRefreshingState<T> model) {
+    protected void notify(@NonNull RemoteDataWithRefreshingState<T> model) {
         notify(model, false);
     }
 

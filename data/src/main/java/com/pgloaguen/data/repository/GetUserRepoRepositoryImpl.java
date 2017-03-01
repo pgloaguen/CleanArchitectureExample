@@ -8,6 +8,7 @@ import com.pgloaguen.data.net.utils.ConnectionFilter;
 import com.pgloaguen.data.net.utils.ConnectionUtils;
 import com.pgloaguen.data.transformer.RepoEntityTransformer;
 import com.pgloaguen.domain.entity.RepoEntity;
+import com.pgloaguen.domain.repository.FavoriteRepoRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
 
 import java.util.List;
@@ -28,17 +29,20 @@ public class GetUserRepoRepositoryImpl implements GetUserRepoRepository {
     private final RepoEntityTransformer repoEntityTransformer;
     private final Cache<Repo> cache;
     private final ConnectionUtils connectionUtils;
+    private final FavoriteRepoRepository favoriteRepoRepository;
 
     @Inject
     public GetUserRepoRepositoryImpl(
             GetUserRepoEndpoint userRepoWS,
             RepoEntityTransformer repoEntityTransformer,
             Cache<Repo> cache,
-            ConnectionUtils connectionUtils) {
+            ConnectionUtils connectionUtils,
+            FavoriteRepoRepository favoriteRepoRepository) {
         this.userRepoWS = userRepoWS;
         this.repoEntityTransformer = repoEntityTransformer;
         this.cache = cache;
         this.connectionUtils = connectionUtils;
+        this.favoriteRepoRepository = favoriteRepoRepository;
     }
 
     @Override
@@ -47,6 +51,7 @@ public class GetUserRepoRepositoryImpl implements GetUserRepoRepository {
                 .compose(new ConnectionFilter<>(connectionUtils))
                 .flatMap(b -> userRepoWS.list(user).flatMap(it -> cache.save(user, it).andThen(Maybe.just(it)).toSingle()).flatMapObservable(Observable::fromIterable))
                 .map(repoEntityTransformer::transform)
+                .flatMap(this::isFavorite)
                 .toList();
     }
 
@@ -57,5 +62,9 @@ public class GetUserRepoRepositoryImpl implements GetUserRepoRepository {
                 .map(repoEntityTransformer::transform)
                 .toList()
                 .flatMapMaybe(it -> it.isEmpty() ? Maybe.empty() : Maybe.just(it));
+    }
+
+    private Observable<RepoEntity> isFavorite(RepoEntity repoEntity) {
+        return Observable.zip(Observable.just(repoEntity), favoriteRepoRepository.isFavorite(repoEntity.id()).toObservable(), RepoEntity::create);
     }
 }

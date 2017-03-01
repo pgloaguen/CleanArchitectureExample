@@ -1,5 +1,6 @@
 package com.pgloaguen.data.di;
 
+import com.pgloaguen.domain.repository.FavoriteRepoRepository;
 import com.pgloaguen.domain.repository.GetUserRepoDetailsRepository;
 import com.pgloaguen.domain.repository.GetUserRepoRepository;
 
@@ -16,4 +17,5 @@ import dagger.Component;
 public interface DataComponent {
     GetUserRepoRepository getUserRepoRepository();
     GetUserRepoDetailsRepository getUserRepoDetailsRepository();
+    FavoriteRepoRepository buildFavoriteRepoRepository();
 }
