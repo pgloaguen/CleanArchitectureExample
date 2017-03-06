@@ -1,10 +1,8 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
 import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
-import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterListener;
+import com.pgloaguen.domain.usecase.GetUserRepo;
 import com.pgloaguen.mycleanarchitectureexample.navigator.Navigator;
-import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,10 +24,10 @@ import static org.mockito.Mockito.verify;
 public class ListUserRepoPresenterTest {
 
     @Mock
-    PresenterListener<RemoteDataWithRefreshingState<List<RepoEntity>>> presenterListener;
+    ListUserRepoView listUserRepoView;
 
     @Mock
-    GetUserRepoUseCase useCase;
+    GetUserRepo useCase;
 
     @Mock
     Navigator navigator;
@@ -49,7 +47,7 @@ public class ListUserRepoPresenterTest {
 
     @Test
     public void presenterDisplayDetailsWhenRepoClick() {
-        presenter.attach(presenterListener);
+        presenter.attach(listUserRepoView);
 
         presenter.onRepoClick(answer.get(0));
         verify(navigator).showRepoDetails("pgloaguen", answer.get(0).name());

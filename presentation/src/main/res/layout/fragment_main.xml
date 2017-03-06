@@ -7,7 +7,15 @@
               android:orientation="vertical"
               tools:context="com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoActivity">
 
-    <include layout="@layout/toolbar"/>
+    <android.support.v7.widget.Toolbar
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/toolbar"
+        app:titleTextColor="@color/colorPrimaryTextInverse"
+        tools:title="Repo name"
+        tools:showIn="@layout/fragment_details"
+        style="@style/Toolbar" />
 
     <FrameLayout
         android:layout_width="match_parent"

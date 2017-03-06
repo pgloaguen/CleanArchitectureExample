@@ -2,7 +2,6 @@ package com.pgloaguen.data.cache;
 
 import android.content.SharedPreferences;
 import android.support.annotation.VisibleForTesting;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -52,9 +51,7 @@ public class SharedPreferenceCache<T> implements Cache<T> {
         return Observable
                 .fromIterable(p)
                 .flatMapSingle(this::toJson)
-                .doOnNext(it -> Log.e("test", it.toString()))
                 .reduce((s, s2) -> s + PARSER_SEP + s2)
-                .doOnSuccess(it -> Log.e("test", it.toString()))
                 .doOnSuccess(s -> sharedPreferences.edit().putString(key, s).apply())
                 .ignoreElement();
 
@@ -63,6 +60,24 @@ public class SharedPreferenceCache<T> implements Cache<T> {
     @Override
     public Completable save(String key, T p) {
         return toJson(p).doOnSuccess(s -> sharedPreferences.edit().putString(key, s).apply()).toCompletable();
+    }
+
+    @Override
+    public Observable<T> register(String key) {
+        return Observable.create(e -> sharedPreferences.registerOnSharedPreferenceChangeListener((sharedPreferences1, s) -> {
+            if (s.equals(key)) {
+                get(key).subscribe(e::onNext);
+            }
+        }));
+    }
+
+    @Override
+    public Observable<List<T>> registerList(String key) {
+        return Observable.create(e -> sharedPreferences.registerOnSharedPreferenceChangeListener((sharedPreferences1, s) -> {
+            if (s.equals(key)) {
+                getAll(key).subscribe(e::onNext);
+            }
+        }));
     }
 
     private Single<String> toJson(T p) {

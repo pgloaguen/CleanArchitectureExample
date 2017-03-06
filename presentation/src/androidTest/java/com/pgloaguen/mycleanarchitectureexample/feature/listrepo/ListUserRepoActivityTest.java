@@ -57,37 +57,37 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void stateEmpty() throws Throwable {
-        givenUiStateIs(SHOW_EMPTY, new ListUserRepoPresenter.ListUserRepoViewModel(Collections.emptyList(), null));
+        givenUiStateIs(SHOW_EMPTY, new ListUserRepoPresenter.VM(Collections.emptyList(), null));
         listUserRepoRobot.isEmptyState();
     }
 
     @Test
     public void stateLoading() throws Throwable {
-        givenUiStateIs(SHOW_LOADING, new ListUserRepoPresenter.ListUserRepoViewModel(Collections.emptyList(), null));
+        givenUiStateIs(SHOW_LOADING, new ListUserRepoPresenter.VM(Collections.emptyList(), null));
         listUserRepoRobot.isLoadingState();
     }
 
     @Test
     public void stateDisplayData() throws Throwable {
-        givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.ListUserRepoViewModel(defaultData, null));
+        givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.VM(defaultData, null));
         listUserRepoRobot.isDisplayDataState();
     }
 
     @Test
     public void stateRefreshing() throws Throwable {
-        givenUiStateIs(SHOW_REFRESHING, new ListUserRepoPresenter.ListUserRepoViewModel(defaultData, null));
+        givenUiStateIs(SHOW_REFRESHING, new ListUserRepoPresenter.VM(defaultData, null));
         listUserRepoRobot.isRefreshingState();
     }
 
     @Test
     public void stateError() throws Throwable {
-        givenUiStateIs(SHOW_ERROR, new ListUserRepoPresenter.ListUserRepoViewModel(Collections.emptyList(),  new NullPointerException("error")));
+        givenUiStateIs(SHOW_ERROR, new ListUserRepoPresenter.VM(Collections.emptyList(),  new NullPointerException("error")));
         listUserRepoRobot.isErrorState();
     }
 
     @Test
     public void stateLoadingWithError() throws Throwable {
-        givenUiStateIs(SHOW_LOADING_WITH_ERROR, new ListUserRepoPresenter.ListUserRepoViewModel(defaultData,  new NullPointerException("error")));
+        givenUiStateIs(SHOW_LOADING_WITH_ERROR, new ListUserRepoPresenter.VM(defaultData,  new NullPointerException("error")));
         listUserRepoRobot.isLoadingWithErrorState();
     }
 
@@ -95,15 +95,15 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void stateErrorWithData() throws Throwable {
-        givenUiStateIs(SHOW_DATA_WITH_ERROR, new ListUserRepoPresenter.ListUserRepoViewModel(defaultData, new NullPointerException("error")));
+        givenUiStateIs(SHOW_DATA_WITH_ERROR, new ListUserRepoPresenter.VM(defaultData, new NullPointerException("error")));
         listUserRepoRobot.isErrorStateWithData();
     }
 
     @Test
     public void possibleToSwipeWhenStateError() throws Throwable {
-        givenUiStateIs(SHOW_ERROR, new ListUserRepoPresenter.ListUserRepoViewModel(new ArrayList<RepoEntity>(), new NullPointerException("error")));
+        givenUiStateIs(SHOW_ERROR, new ListUserRepoPresenter.VM(new ArrayList<RepoEntity>(), new NullPointerException("error")));
         doAnswer(invocation -> {
-            givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.ListUserRepoViewModel(defaultData, null));
+            givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.VM(defaultData, null));
             return null;
         }).when(presenter).askForRefresh();
 
@@ -114,9 +114,9 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void possibleToSwipeWhenStateEmpty() throws Throwable {
-        givenUiStateIs(SHOW_EMPTY, new ListUserRepoPresenter.ListUserRepoViewModel());
+        givenUiStateIs(SHOW_EMPTY, new ListUserRepoPresenter.VM());
         doAnswer(invocation -> {
-            givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.ListUserRepoViewModel(defaultData, null));
+            givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.VM(defaultData, null));
             return null;
         }).when(presenter).askForRefresh();
 
@@ -125,7 +125,7 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
         listUserRepoRobot.isDisplayDataState();
     }
 
-    private void givenUiStateIs(ListUserRepoPresenter.StateValue state, ListUserRepoPresenter.ListUserRepoViewModel data) throws Throwable {
+    private void givenUiStateIs(ListUserRepoPresenter.StateValue state, ListUserRepoPresenter.VM data) throws Throwable {
         uiThreadTestRule.runOnUiThread(() ->
                 ((ListUserRepoFragment) mActivityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment)).notify(state, data));
     }

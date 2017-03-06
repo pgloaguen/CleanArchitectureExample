@@ -18,7 +18,7 @@ import static org.mockito.BDDMockito.given;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class FavoriteRepoImplTest {
+public class FavoriteRepoWithIdImplTest {
 
     @Mock
     Cache<Boolean> cache;

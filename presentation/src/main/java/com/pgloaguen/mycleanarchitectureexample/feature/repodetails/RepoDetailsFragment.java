@@ -8,12 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
-import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
+import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithPresenterCache;
 import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterCache;
 
 import javax.inject.Inject;
@@ -21,17 +21,11 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.DisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.ErrorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.LoadingWithErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.RefreshingState;
-
 /**
  * Created by paul on 26/01/2017.
  */
 
-public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshingState<RepoDetailsEntity, RepoDetailsPresenter> {
+public class RepoDetailsFragment extends BaseFragmentWithPresenterCache<RepoDetailsPresenter> implements RepoDetailsView {
 
     private static final String KEY_USERNAME = "username";
     private static final String KEY_REPONAME = "reponame";
@@ -44,6 +38,9 @@ public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshin
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.btn_favorite)
+    ImageView favorite;
 
     @BindView(R.id.desc)
     TextView descTextView;
@@ -84,46 +81,58 @@ public class RepoDetailsFragment extends BaseFragmentWithRemoteDataWithRefreshin
 
     @Override
     protected void init(@NonNull RepoDetailsPresenter presenter) {
-        presenter.init(getArguments().getString(KEY_USERNAME), getArguments().getString(KEY_REPONAME));
+        presenter.attach(this, getArguments().getString(KEY_USERNAME), getArguments().getString(KEY_REPONAME));
     }
 
     @Override
+    public void onDestroyView() {
+        presenter.detach();
+        super.onDestroyView();
+    }
+
     protected void displayFirstFetchLoadingScreen() {
         descTextView.setText(R.string.loading);
+        descTextView.setOnClickListener(null);
+        favorite.setVisibility(View.GONE);
     }
 
-    @Override
-    protected void displayRefreshingScreen(RefreshingState<RepoDetailsEntity> viewModel) {
-        toolbar.setTitle(viewModel.datas().name());
-        descTextView.setText(R.string.refreshing);
-    }
-
-    @Override
-    protected void displayLoadingWithErrorScreen(LoadingWithErrorState<RepoDetailsEntity> viewModel) {
-        descTextView.setText(R.string.loading);
-    }
-
-    @Override
     protected void displayEmptyScreen() {
         descTextView.setText("");
         toolbar.setTitle("");
+        descTextView.setOnClickListener(null);
+        favorite.setVisibility(View.GONE);
+    }
+
+    protected void displayDataScreen(RepoDetailsEntity viewModel) {
+        toolbar.setTitle(viewModel.name());
+        descTextView.setText(viewModel.desc());
+        descTextView.setOnClickListener(null);
+        favorite.setImageResource(viewModel.isFavorite() ? R.drawable.ic_favorite_on : R.drawable.ic_favorite_off);
+        favorite.setVisibility(View.VISIBLE);
+        favorite.setOnClickListener(__ -> presenter.toggleFavorite(viewModel));
+    }
+
+    protected void displayErrorScreen(String error) {
+        descTextView.setText(error);
+        favorite.setVisibility(View.GONE);
+        descTextView.setOnClickListener(view -> presenter.retry());
     }
 
     @Override
-    protected void displayDataScreen(DisplayDataState<RepoDetailsEntity> viewModel) {
-        toolbar.setTitle(viewModel.datas().name());
-        descTextView.setText(viewModel.datas().desc());
-    }
-
-    @Override
-    protected void displayErrorWithDataScreen(ErrorWithDisplayDataState<RepoDetailsEntity> viewModel) {
-        toolbar.setTitle(viewModel.datas().name());
-        descTextView.setText(viewModel.datas().desc());
-        Toast.makeText(getActivity(), viewModel.error(), Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    protected void displayErrorScreen(ErrorState viewModel) {
-        descTextView.setText(viewModel.error());
+    public void notify(@NonNull RepoDetailsPresenter.StateValue state, @NonNull RepoDetailsPresenter.VM model) {
+        switch (state) {
+            case EMPTY:
+                displayEmptyScreen();
+                break;
+            case LOADING:
+                displayFirstFetchLoadingScreen();
+                break;
+            case DISPLAY:
+                displayDataScreen(model.data);
+                break;
+            case DISPLAY_ERROR:
+                displayErrorScreen(model.error.getMessage());
+                break;
+        }
     }
 }

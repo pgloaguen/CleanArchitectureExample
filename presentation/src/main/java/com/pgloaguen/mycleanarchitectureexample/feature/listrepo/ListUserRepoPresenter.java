@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.FavoriteRepo;
-import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
+import com.pgloaguen.domain.usecase.GetUserRepo;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.base.state.StateMachine;
 import com.pgloaguen.mycleanarchitectureexample.navigator.Navigator;
@@ -16,9 +16,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.EventValue.DATA_UPDATE;
 import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.EventValue.ERROR;
 import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.EventValue.LOAD;
 import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.EventValue.NEW_DATA;
@@ -44,57 +46,59 @@ public class ListUserRepoPresenter {
     }
 
     public enum EventValue {
-        LOAD, NEW_DATA, NO_DATA, ERROR
+        LOAD, NEW_DATA, DATA_UPDATE, NO_DATA, ERROR
     }
 
-    public static class ListUserRepoViewModel {
+    public static class VM {
         @NonNull
         public List<RepoEntity> repoEntities;
 
         @Nullable
         public Throwable error;
 
-        public ListUserRepoViewModel(@NonNull List<RepoEntity> repoEntities, @Nullable Throwable error) {
+        public VM(@NonNull List<RepoEntity> repoEntities, @Nullable Throwable error) {
             this.repoEntities = repoEntities;
             this.error = error;
         }
 
-        public ListUserRepoViewModel() {
+        public VM() {
             this(Collections.emptyList(), null);
         }
     }
 
     private final FavoriteRepo favoriteRepoUseCase;
     private final Navigator navigator;
-    private final UseCase<List<RepoEntity>, GetUserRepoUseCase.Param> getUserRepoUseCase;
-    private final StateMachine<StateValue, EventValue, ListUserRepoViewModel> stateMachine;
+    private final UseCase<List<RepoEntity>, GetUserRepo.Param> getUserRepoUseCase;
+    private final StateMachine<StateValue, EventValue, VM> stateMachine;
 
 
     @Inject
-    public ListUserRepoPresenter(UseCase<List<RepoEntity>, GetUserRepoUseCase.Param> getUserRepoUseCase, FavoriteRepo favoriteRepoUseCase, Navigator navigator) {
+    public ListUserRepoPresenter(UseCase<List<RepoEntity>, GetUserRepo.Param> getUserRepoUseCase, FavoriteRepo favoriteRepoUseCase, Navigator navigator) {
         this.getUserRepoUseCase = getUserRepoUseCase;
         this.favoriteRepoUseCase = favoriteRepoUseCase;
         this.navigator = navigator;
         this.stateMachine = initStateMachine();
     }
 
-    private StateMachine<StateValue, EventValue, ListUserRepoViewModel> initStateMachine() {
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowEmpty = new StateMachine.State<>(SHOW_EMPTY);
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowLoading = new StateMachine.State<>(SHOW_LOADING);
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowRefreshing = new StateMachine.State<>(SHOW_REFRESHING);
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowLoadingWithError = new StateMachine.State<>(SHOW_LOADING_WITH_ERROR);
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowData = new StateMachine.State<>(SHOW_DATA);
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowDataWithError = new StateMachine.State<>(SHOW_DATA_WITH_ERROR);
-        StateMachine.State<StateValue, EventValue, ListUserRepoViewModel> stateShowError = new StateMachine.State<>(SHOW_ERROR);
+    private StateMachine<StateValue, EventValue, VM> initStateMachine() {
+        StateMachine.State<StateValue, EventValue, VM> stateShowEmpty = new StateMachine.State<>(SHOW_EMPTY);
+        StateMachine.State<StateValue, EventValue, VM> stateShowLoading = new StateMachine.State<>(SHOW_LOADING);
+        StateMachine.State<StateValue, EventValue, VM> stateShowRefreshing = new StateMachine.State<>(SHOW_REFRESHING);
+        StateMachine.State<StateValue, EventValue, VM> stateShowLoadingWithError = new StateMachine.State<>(SHOW_LOADING_WITH_ERROR);
+        StateMachine.State<StateValue, EventValue, VM> stateShowData = new StateMachine.State<>(SHOW_DATA);
+        StateMachine.State<StateValue, EventValue, VM> stateShowDataWithError = new StateMachine.State<>(SHOW_DATA_WITH_ERROR);
+        StateMachine.State<StateValue, EventValue, VM> stateShowError = new StateMachine.State<>(SHOW_ERROR);
 
         stateShowEmpty
                 .addEvent(LOAD, stateShowLoading);
 
         stateShowData
-                .addEvent(LOAD, stateShowRefreshing);
+                .addEvent(LOAD, stateShowRefreshing)
+                .addEvent(DATA_UPDATE, stateShowData);
 
         stateShowDataWithError
-                .addEvent(LOAD, stateShowLoadingWithError);
+                .addEvent(LOAD, stateShowLoadingWithError)
+                .addEvent(DATA_UPDATE, stateShowData);
 
         stateShowError
                 .addEvent(LOAD, stateShowLoadingWithError);
@@ -107,14 +111,13 @@ public class ListUserRepoPresenter {
         stateShowRefreshing
                 .addEvent(NEW_DATA, stateShowData)
                 .addEvent(NO_DATA, stateShowEmpty)
-                .addEvent(ERROR, stateShowDataWithError);
+                .addEvent(ERROR, stateShowDataWithError)
+                .addEvent(DATA_UPDATE, stateShowRefreshing);
 
         stateShowLoadingWithError
                 .addEvent(NEW_DATA, stateShowData)
                 .addEvent(NO_DATA, stateShowEmpty)
                 .addEvent(ERROR, stateShowError);
-
-
 
         return new StateMachine<>(stateShowEmpty);
     }
@@ -124,7 +127,7 @@ public class ListUserRepoPresenter {
             if (it.id == SHOW_EMPTY) {
                 loadRepo("pgloaguen", false);
             }
-        }).subscribe(s -> view.notify(s.id, s.data == null ? new ListUserRepoViewModel() : s.data));
+        }).subscribe(s -> view.notify(s.id, s.data == null ? new VM() : s.data));
     }
 
     public void detach() {
@@ -140,19 +143,25 @@ public class ListUserRepoPresenter {
     }
 
     public void onFavoriteClick(RepoEntity repoEntity) {
-
+        favoriteRepoUseCase.execute(repoEntity)
+                .subscribe(repoFavoriteUpdated ->
+                    stateMachine.nextState(DATA_UPDATE, true, it ->
+                            new VM(
+                            Observable.fromIterable(it.repoEntities)
+                            .map(r -> r.id() == repoEntity.id() ? repoFavoriteUpdated : r)
+                            .toList().blockingGet(), null)));
     }
 
     private void loadRepo(String username, boolean invalidate) {
         stateMachine.nextState(LOAD, it -> it);
-        getUserRepoUseCase.execute(GetUserRepoUseCase.Param.create(username, invalidate))
-                .map(repos -> new ListUserRepoViewModel(repos, null))
-                .onErrorReturn(t -> new ListUserRepoViewModel(new ArrayList<>(), t))
+        getUserRepoUseCase.execute(GetUserRepo.Param.create(username, invalidate))
+                .map(repos -> new VM(repos, null))
+                .onErrorReturn(t -> new VM(new ArrayList<>(), t))
                 .subscribe(vm -> {
                     if (vm.error == null) {
                         stateMachine.nextState(NEW_DATA, __ -> vm);
                     } else {
-                        stateMachine.nextState(ERROR, it -> new ListUserRepoViewModel(it.repoEntities, vm.error));
+                        stateMachine.nextState(ERROR, it -> new VM(it.repoEntities, vm.error));
                     }
                 });
     }

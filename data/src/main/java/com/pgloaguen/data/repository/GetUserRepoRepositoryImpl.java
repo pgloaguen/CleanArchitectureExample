@@ -64,6 +64,12 @@ public class GetUserRepoRepositoryImpl implements GetUserRepoRepository {
                 .flatMapMaybe(it -> it.isEmpty() ? Maybe.empty() : Maybe.just(it));
     }
 
+    @Override
+    public Observable<List<RepoEntity>> registerRepoUpdated(String user) {
+        return cache.registerList(user)
+                .flatMapSingle(l -> Observable.fromIterable(l).map(repoEntityTransformer::transform).toList());
+    }
+
     private Observable<RepoEntity> isFavorite(RepoEntity repoEntity) {
         return Observable.zip(Observable.just(repoEntity), favoriteRepoRepository.isFavorite(repoEntity.id()).toObservable(), RepoEntity::create);
     }

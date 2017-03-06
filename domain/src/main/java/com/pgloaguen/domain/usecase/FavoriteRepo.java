@@ -1,28 +1,26 @@
 package com.pgloaguen.domain.usecase;
 
-import com.pgloaguen.domain.repository.FavoriteRepoRepository;
+import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.domain.usecase.base.UseCase;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
 /**
- * Created by paul on 24/02/2017.
+ * Created by polo on 04/03/2017.
  */
 
-public class FavoriteRepo extends UseCase<Boolean, Long> {
+public class FavoriteRepo extends UseCase<RepoEntity, RepoEntity> {
 
-    private final FavoriteRepoRepository repository;
+    private FavoriteRepoWithId favoriteRepo;
 
-    public FavoriteRepo(FavoriteRepoRepository repository, Scheduler runScheduler, Scheduler postScheduler) {
+    public FavoriteRepo(FavoriteRepoWithId favoriteRepo, Scheduler runScheduler, Scheduler postScheduler) {
         super(runScheduler, postScheduler);
-        this.repository = repository;
+        this.favoriteRepo = favoriteRepo;
     }
 
     @Override
-    protected Observable<Boolean> build(Long repoId) {
-        return repository.isFavorite(repoId)
-                .flatMap(isFavorite -> isFavorite ? repository.unfavoriteRepo(repoId).toSingleDefault(false) : repository.favoriteRepo(repoId).toSingleDefault(true))
-                .toObservable();
+    protected Observable<RepoEntity> build(RepoEntity param) {
+        return favoriteRepo.execute(param.id()).map(isFavorite -> RepoEntity.create(param, isFavorite));
     }
 }

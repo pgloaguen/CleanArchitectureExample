@@ -7,20 +7,20 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.reactivex.observers.TestObserver;
 
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.EventValue.ERROR;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.EventValue.LOAD;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.EventValue.NEW_DATA;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.EventValue.NO_DATA;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.StateValue.SHOW_DATA;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.StateValue.SHOW_EMPTY;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.StateValue.SHOW_ERROR;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.StateTest.StateValue.SHOW_LOADING;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.EventValue.ERROR;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.EventValue.LOAD;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.EventValue.NEW_DATA;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.EventValue.NO_DATA;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.StateValue.SHOW_DATA;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.StateValue.SHOW_EMPTY;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.StateValue.SHOW_ERROR;
+import static com.pgloaguen.mycleanarchitectureexample.base.state.StateMachineTest.StateValue.SHOW_LOADING;
 
 /**
  * Created by paul on 27/02/2017.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class StateTest {
+public class StateMachineTest {
 
     public enum StateValue {
         SHOW_EMPTY, SHOW_LOADING, SHOW_DATA, SHOW_ERROR
@@ -58,6 +58,14 @@ public class StateTest {
         TestObserver<StateMachine.State<StateValue, EventValue, String>> testObservable = stateMachine.observeState().test();
         stateMachine.nextState(ERROR);
         testObservable.assertError(IllegalStateException.class);
+    }
+
+    @Test
+    public void testAnExceptionNotOccuredWhenAStateDoesNotHandleTheEventAndErrorIsIgnored() throws InterruptedException {
+        StateMachine<StateValue, EventValue, String> stateMachine = new StateMachine<>(stateShowEmpty);
+        TestObserver<StateMachine.State<StateValue, EventValue, String>> testObservable = stateMachine.observeState().test();
+        stateMachine.nextState(ERROR, true);
+        testObservable.assertValueAt(1, state -> state.id == SHOW_EMPTY);
     }
 
 

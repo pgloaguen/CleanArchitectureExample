@@ -13,11 +13,11 @@ import io.reactivex.Scheduler;
  * Created by paul on 19/01/2017.
  */
 
-public class GetUserRepoDetailsUseCase extends UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> {
+public class GetUserRepoDetails extends UseCase<RepoDetailsEntity, GetUserRepoDetails.Param> {
 
     private final GetUserRepoDetailsRepository repository;
 
-    public GetUserRepoDetailsUseCase(GetUserRepoDetailsRepository repository, Scheduler runScheduler, Scheduler postScheduler) {
+    public GetUserRepoDetails(GetUserRepoDetailsRepository repository, Scheduler runScheduler, Scheduler postScheduler) {
         super(runScheduler, postScheduler);
         this.repository = repository;
     }

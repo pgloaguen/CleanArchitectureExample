@@ -7,5 +7,5 @@ import android.support.annotation.NonNull;
  */
 
 public interface ListUserRepoView {
-    void notify(@NonNull ListUserRepoPresenter.StateValue state, @NonNull  ListUserRepoPresenter.ListUserRepoViewModel model);
+    void notify(@NonNull ListUserRepoPresenter.StateValue state, @NonNull ListUserRepoPresenter.VM model);
 }

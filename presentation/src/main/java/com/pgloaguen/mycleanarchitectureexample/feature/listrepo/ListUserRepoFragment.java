@@ -101,7 +101,7 @@ public class ListUserRepoFragment extends BaseFragmentWithPresenterCache<ListUse
 
             @Override
             public void onRepoFavorite(RepoEntity repoEntity) {
-
+                presenter.onFavoriteClick(repoEntity);
             }
         });
         swipeRefreshLayout.setOnRefreshListener(presenter::askForRefresh);
@@ -179,7 +179,7 @@ public class ListUserRepoFragment extends BaseFragmentWithPresenterCache<ListUse
     }
 
     @Override
-    public void notify(ListUserRepoPresenter.StateValue state, ListUserRepoPresenter.ListUserRepoViewModel model) {
+    public void notify(@NonNull ListUserRepoPresenter.StateValue state, @NonNull ListUserRepoPresenter.VM model) {
         switch (state) {
             case SHOW_EMPTY:
                 displayEmptyScreen();

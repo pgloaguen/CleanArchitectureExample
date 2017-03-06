@@ -1,10 +1,13 @@
 package com.pgloaguen.data.repository;
 
+import android.support.annotation.NonNull;
+
 import com.pgloaguen.data.cache.Cache;
 import com.pgloaguen.domain.repository.FavoriteRepoRepository;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -21,16 +24,26 @@ public class FavoriteRepoImpl implements FavoriteRepoRepository {
 
     @Override
     public Completable favoriteRepo(long repoId) {
-        return cache.save(String.valueOf(repoId), true);
+        return cache.save(getKey(repoId), true);
     }
 
     @Override
     public Completable unfavoriteRepo(long repoId) {
-        return cache.save(String.valueOf(repoId), false);
+        return cache.save(getKey(repoId), false);
     }
 
     @Override
     public Single<Boolean> isFavorite(long repoId) {
-        return cache.get(String.valueOf(repoId)).switchIfEmpty(Maybe.just(false)).toSingle();
+        return cache.get(getKey(repoId)).switchIfEmpty(Maybe.just(false)).toSingle();
+    }
+
+    @Override
+    public Observable<Boolean> registerFavoriteUpdate(long repoId) {
+        return cache.register(getKey(repoId));
+    }
+
+    @NonNull
+    private String getKey(long repoId) {
+        return String.valueOf(repoId);
     }
 }

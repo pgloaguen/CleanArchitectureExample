@@ -1,6 +1,8 @@
 package com.pgloaguen.domain.repository;
 
+
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -11,4 +13,5 @@ public interface FavoriteRepoRepository {
     Completable favoriteRepo(long repoId);
     Completable unfavoriteRepo(long repoId);
     Single<Boolean> isFavorite(long repoId);
+    Observable<Boolean> registerFavoriteUpdate(long repoId);
 }

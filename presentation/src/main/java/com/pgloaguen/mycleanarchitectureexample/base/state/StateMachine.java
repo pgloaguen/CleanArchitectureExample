@@ -1,5 +1,7 @@
 package com.pgloaguen.mycleanarchitectureexample.base.state;
 
+import android.support.annotation.Nullable;
+
 import java.util.HashMap;
 
 import io.reactivex.Observable;
@@ -24,33 +26,47 @@ public class StateMachine<I, E, D> {
         return stateObservable;
     }
 
+    public void nextState(E event, boolean shouldIgnoreIfError, Reducer<D> data) {
+        eventPublisher.onNext(new Event<>(event, data, shouldIgnoreIfError));
+    }
+
     public void nextState(E event, Reducer<D> data) {
-        eventPublisher.onNext(new Event<>(event, data));
+        nextState(event, false, data);
+    }
+
+    public void nextState(E event, boolean shouldIgnoreIfError) {
+        nextState(event, shouldIgnoreIfError, __ -> null);
     }
 
     public void nextState(E event) {
-        nextState(event, __ -> null);
+        nextState(event, false, __ -> null);
     }
 
     private State<I, E, D> nextState(State<I, E, D> state, Event<E, D> event) {
         State<I, E, D> newState = state.nextState(event.id, event.reducer.updateData(state.data));
         if (newState == null) {
-            throw new IllegalStateException("The event " + event.id + " is not handle by the state " + state);
+            if (event.shouldIgnoreIfError) {
+                return state;
+            } else {
+                throw new IllegalStateException("The event " + event.id + " is not handle by the state " + state);
+            }
         }
         return newState;
     }
 
     public interface Reducer<D>  {
-        D updateData(D oldData);
+        @Nullable D updateData(@Nullable D oldData);
     }
 
     private static class Event<E, D> {
         private E id;
-        Reducer<D> reducer;
+        private Reducer<D> reducer;
+        private boolean shouldIgnoreIfError;
 
-        private Event(E id, Reducer<D> reducer) {
+        private Event(E id, Reducer<D> reducer, boolean shouldIgnoreIfError) {
             this.id = id;
             this.reducer = reducer;
+            this.shouldIgnoreIfError = shouldIgnoreIfError;
         }
     }
 

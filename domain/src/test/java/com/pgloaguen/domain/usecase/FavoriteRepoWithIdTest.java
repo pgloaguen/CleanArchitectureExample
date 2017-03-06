@@ -19,16 +19,16 @@ import static org.mockito.BDDMockito.given;
  * Created by paul on 24/02/2017.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class FavoriteRepoTest {
+public class FavoriteRepoWithIdTest {
 
     @Mock
     FavoriteRepoRepository repository;
 
-    private FavoriteRepo usecase;
+    private FavoriteRepoWithId usecase;
 
     @Before
     public void setup() {
-        usecase = new FavoriteRepo(repository, Schedulers.io(), Schedulers.io());
+        usecase = new FavoriteRepoWithId(repository, Schedulers.io(), Schedulers.io());
     }
 
     @Test

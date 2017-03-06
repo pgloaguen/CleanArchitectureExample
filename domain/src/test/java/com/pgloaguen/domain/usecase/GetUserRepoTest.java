@@ -29,11 +29,11 @@ public class GetUserRepoTest {
     @Mock
     GetUserRepoRepository repository;
 
-    private GetUserRepoUseCase userRepo;
+    private GetUserRepo userRepo;
 
     @Before
     public void setup() {
-        userRepo = new GetUserRepoUseCase(repository, Schedulers.io(), Schedulers.io());
+        userRepo = new GetUserRepo(repository, Schedulers.io(), Schedulers.io());
     }
 
 
@@ -44,7 +44,7 @@ public class GetUserRepoTest {
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
         given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", false)).test()
+        userRepo.execute(GetUserRepo.Param.create("", false)).test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == lastValues);
     }
@@ -55,7 +55,7 @@ public class GetUserRepoTest {
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
         given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.error(new NullPointerException("null")));
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", false))
+        userRepo.execute(GetUserRepo.Param.create("", false))
                 .test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == values);
@@ -67,7 +67,7 @@ public class GetUserRepoTest {
         given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.empty());
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", false)).test()
+        userRepo.execute(GetUserRepo.Param.create("", false)).test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == values);
     }
@@ -77,7 +77,7 @@ public class GetUserRepoTest {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
+        userRepo.execute(GetUserRepo.Param.create("", true)).test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == values);
     }
@@ -87,7 +87,7 @@ public class GetUserRepoTest {
         List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.error(new NullPointerException("null")));
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
+        userRepo.execute(GetUserRepo.Param.create("", true)).test()
                 .await()
                 .assertError(NullPointerException.class);
     }
