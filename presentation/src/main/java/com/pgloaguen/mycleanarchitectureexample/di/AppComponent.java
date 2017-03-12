@@ -3,8 +3,11 @@ package com.pgloaguen.mycleanarchitectureexample.di;
 import com.pgloaguen.data.di.DataComponent;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
 import com.pgloaguen.domain.entity.RepoEntity;
-import com.pgloaguen.domain.usecase.GetUserRepoDetailsUseCase;
-import com.pgloaguen.domain.usecase.GetUserRepoUseCase;
+import com.pgloaguen.domain.usecase.FavoriteRepo;
+import com.pgloaguen.domain.usecase.FavoriteRepoWithId;
+import com.pgloaguen.domain.usecase.FavoriteRepoDetails;
+import com.pgloaguen.domain.usecase.GetUserRepo;
+import com.pgloaguen.domain.usecase.GetUserRepoDetails;
 import com.pgloaguen.domain.usecase.base.UseCase;
 import com.pgloaguen.mycleanarchitectureexample.base.presenter.PresenterCache;
 import com.pgloaguen.mycleanarchitectureexample.di.module.PresenterCacheModule;
@@ -24,9 +27,12 @@ import dagger.Component;
 @AppScope
 @Component(modules = {UseCaseModule.class, PresenterCacheModule.class}, dependencies = {DataComponent.class})
 public interface AppComponent {
-    UseCase<List<RepoEntity>, GetUserRepoUseCase.Param> provideGetUserRepoUseCase();
-    UseCase<RepoDetailsEntity, GetUserRepoDetailsUseCase.Param> provideGetUserDetailsRepoUseCase();
+    UseCase<List<RepoEntity>, GetUserRepo.Param> provideGetUserRepoUseCase();
+    UseCase<RepoDetailsEntity, GetUserRepoDetails.Param> provideGetUserDetailsRepoUseCase();
+    FavoriteRepoWithId provideFavoriteRepoUseCase();
+    FavoriteRepo provideFavoriteRepoEntityUseCase();
+    FavoriteRepoDetails provideFavoriteRepoDetailsEntityUseCase();
 
-    PresenterCache<ListUserRepoPresenter> provideListUserRepoPresenterPresenterCache();
+    PresenterCache<ListUserRepoPresenter> provideListUserRepoPresenterPresenter2Cache();
     PresenterCache<RepoDetailsPresenter> provideRepoDetailsPresenterPresenterCache();
 }

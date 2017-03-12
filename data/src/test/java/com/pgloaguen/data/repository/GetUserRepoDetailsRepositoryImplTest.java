@@ -6,6 +6,7 @@ import com.pgloaguen.data.net.utils.ConnectionFilter;
 import com.pgloaguen.data.net.utils.ConnectionUtils;
 import com.pgloaguen.data.transformer.RepoDetailsEntityTransformer;
 import com.pgloaguen.domain.entity.RepoDetailsEntity;
+import com.pgloaguen.domain.repository.FavoriteRepoRepository;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import io.reactivex.Single;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -35,15 +37,19 @@ public class GetUserRepoDetailsRepositoryImplTest {
     @Mock
     ConnectionUtils connectionUtils;
 
+    @Mock
+    FavoriteRepoRepository favoriteRepoRepository;
+
     @Test
     public void fetchHappyCase() {
         RepoDetails repoDetails = mock(RepoDetails.class);
-        RepoDetailsEntity repoDetailsEntity = mock(RepoDetailsEntity.class);
+        RepoDetailsEntity repoDetailsEntity = RepoDetailsEntity.create(0, "name", "desc", true);
         given(userRepoWs.fetch(anyString(), anyString())).willReturn(Single.just(repoDetails));
         given(transformer.transform(any())).willReturn(repoDetailsEntity);
         given(connectionUtils.isConnected()).willReturn(true);
+        given(favoriteRepoRepository.isFavorite(anyLong())).willReturn(Single.just(true));
 
-        GetUserRepoDetailsRepositoryImpl repository = new GetUserRepoDetailsRepositoryImpl(userRepoWs, transformer, connectionUtils);
+        GetUserRepoDetailsRepositoryImpl repository = new GetUserRepoDetailsRepositoryImpl(userRepoWs, transformer, connectionUtils, favoriteRepoRepository);
         repository.fetchUserRepoDetails("", "")
                 .test()
                 .assertValue(repoDetailsEntity);
@@ -51,11 +57,9 @@ public class GetUserRepoDetailsRepositoryImplTest {
 
     @Test
     public void fetchNoNetworkError() {
-        RepoDetails repoDetails = mock(RepoDetails.class);
-        given(userRepoWs.fetch(anyString(), anyString())).willReturn(Single.just(repoDetails));
         given(connectionUtils.isConnected()).willReturn(false);
 
-        GetUserRepoDetailsRepositoryImpl repository = new GetUserRepoDetailsRepositoryImpl(userRepoWs, transformer, connectionUtils);
+        GetUserRepoDetailsRepositoryImpl repository = new GetUserRepoDetailsRepositoryImpl(userRepoWs, transformer, connectionUtils, favoriteRepoRepository);
         repository.fetchUserRepoDetails("", "")
                 .test()
                 .assertError(ConnectionFilter.NoConnectedException.class);

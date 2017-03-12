@@ -10,7 +10,7 @@ import com.pgloaguen.domain.entity.RepoEntity;
 public class RepoEntityTransformer implements Transformer<Repo, RepoEntity>{
 
     public RepoEntity transform(Repo repo) {
-        return RepoEntity.create(repo.id(), repo.name(), repo.description() == null ? "" : repo.description());
+        return RepoEntity.create(repo.id(), repo.name(), repo.description() == null ? "" : repo.description(), false);
     }
 
 }

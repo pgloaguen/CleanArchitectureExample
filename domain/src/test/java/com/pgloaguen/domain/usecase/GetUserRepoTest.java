@@ -11,8 +11,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
@@ -29,13 +31,12 @@ public class GetUserRepoTest {
     @Mock
     GetUserRepoRepository repository;
 
-    private GetUserRepoUseCase userRepo;
+    private GetUserRepo userRepo;
 
     @Before
     public void setup() {
-        userRepo = new GetUserRepoUseCase(repository, Schedulers.io(), Schedulers.io());
+        userRepo = new GetUserRepo(repository, Schedulers.io(), Schedulers.io());
     }
-
 
     @Test
     public void getUserRepoUseCaseHappyCase() throws Exception {
@@ -43,10 +44,61 @@ public class GetUserRepoTest {
         List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
         given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
+        given(repository.registerRepoUpdated(anyString())).willReturn(Observable.empty());
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", false)).test()
+        userRepo.execute(GetUserRepo.Param.create("", false)).test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == lastValues);
+    }
+
+    @Test
+    public void getUserRepoUseCaseWithRepoUpdateHappyCase() throws Exception {
+        List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        List<RepoEntity> updateValues1 = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        List<RepoEntity> updateValues2 = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        Observable<List<RepoEntity>> repoUpdate = Observable.<List<RepoEntity>>create(e -> {
+            e.onNext(updateValues1);
+            e.onNext(updateValues2);
+            e.onComplete();
+        });
+
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
+        given(repository.registerRepoUpdated(anyString())).willReturn(repoUpdate);
+
+        userRepo.execute(GetUserRepo.Param.create("", false))
+            .test()
+            .await()
+            .assertValueAt(0, repoEntities -> repoEntities == lastValues)
+            .assertValueAt(1, repoEntities -> repoEntities == updateValues1)
+            .assertValueAt(2, repoEntities -> repoEntities == updateValues2);
+    }
+
+    @Test
+    public void getUserRepoUseCaseWithFailedRepoUpdateHappyCase() throws Exception {
+        List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+        final List<RepoEntity> updateValues1 = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
+
+        AtomicBoolean firstTime = new AtomicBoolean(true);
+        Observable<List<RepoEntity>> repoUpdate = Observable.create(e -> {
+            if (firstTime.getAndSet(false)) {
+                e.onError(new NullPointerException());
+            } else {
+                e.onNext(updateValues1);
+                e.onComplete();
+            }
+        });
+
+        given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
+        given(repository.registerRepoUpdated(anyString())).willReturn(repoUpdate);
+
+        userRepo.execute(GetUserRepo.Param.create("", false))
+                .test().await()
+                .assertNoErrors()
+                .assertValueAt(1, r -> r == updateValues1);
     }
 
     @Test
@@ -54,8 +106,9 @@ public class GetUserRepoTest {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
         given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.error(new NullPointerException("null")));
+        given(repository.registerRepoUpdated(anyString())).willReturn(Observable.empty());
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", false))
+        userRepo.execute(GetUserRepo.Param.create("", false))
                 .test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == values);
@@ -66,8 +119,9 @@ public class GetUserRepoTest {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.empty());
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+        given(repository.registerRepoUpdated(anyString())).willReturn(Observable.empty());
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", false)).test()
+        userRepo.execute(GetUserRepo.Param.create("", false)).test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == values);
     }
@@ -76,19 +130,19 @@ public class GetUserRepoTest {
     public void getUserRepoUseCaseForceUpdateHappyCase() throws Exception {
         List<RepoEntity> values = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.just(values));
+        given(repository.registerRepoUpdated(anyString())).willReturn(Observable.empty());
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
+        userRepo.execute(GetUserRepo.Param.create("", true)).test()
                 .await()
                 .assertValue(repoEntities -> repoEntities == values);
     }
 
     @Test
     public void getUserRepoUseCaseForceUpdateError() throws Exception {
-        List<RepoEntity> lastValues = Arrays.asList(mock(RepoEntity.class), mock(RepoEntity.class));
         given(repository.fetchUserRepo(anyString())).willReturn(Single.error(new NullPointerException("null")));
-        given(repository.fetchLastUserRepoResult(anyString())).willReturn(Maybe.just(lastValues));
+        given(repository.registerRepoUpdated(anyString())).willReturn(Observable.empty());
 
-        userRepo.execute(GetUserRepoUseCase.Param.create("", true)).test()
+        userRepo.execute(GetUserRepo.Param.create("", true)).test()
                 .await()
                 .assertError(NullPointerException.class);
     }

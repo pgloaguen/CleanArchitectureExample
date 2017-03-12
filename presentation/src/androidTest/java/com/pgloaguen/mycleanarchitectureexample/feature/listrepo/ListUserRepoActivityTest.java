@@ -7,25 +7,25 @@ import android.support.test.runner.AndroidJUnit4;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 import com.pgloaguen.mycleanarchitectureexample.base.BaseActivityTest;
-import com.pgloaguen.mycleanarchitectureexample.base.fragment.BaseFragmentWithRemoteDataWithRefreshingState;
-import com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.displayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.emptyState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.errorState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.errorWithDisplayDataState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.loadingState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.loadingWithErrorState;
-import static com.pgloaguen.mycleanarchitectureexample.base.state.RemoteDataWithRefreshingState.refreshingState;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_DATA;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_DATA_WITH_ERROR;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_EMPTY;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_ERROR;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_LOADING;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_LOADING_WITH_ERROR;
+import static com.pgloaguen.mycleanarchitectureexample.feature.listrepo.ListUserRepoPresenter.StateValue.SHOW_REFRESHING;
 import static org.mockito.Mockito.doAnswer;
 
 /**
@@ -46,6 +46,8 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     private ListUserRepoRobot listUserRepoRobot = new ListUserRepoRobot();
 
+    private List<RepoEntity> defaultData = Collections.singletonList(RepoEntity.create(0, "name", "desc", false));
+
     @Before
     public void setUp() {
         init();
@@ -55,51 +57,53 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void stateEmpty() throws Throwable {
-        givenUiStateIs(emptyState());
+        givenUiStateIs(SHOW_EMPTY, new ListUserRepoPresenter.VM(Collections.emptyList(), null));
         listUserRepoRobot.isEmptyState();
     }
 
     @Test
     public void stateLoading() throws Throwable {
-        givenUiStateIs(loadingState());
+        givenUiStateIs(SHOW_LOADING, new ListUserRepoPresenter.VM(Collections.emptyList(), null));
         listUserRepoRobot.isLoadingState();
     }
 
     @Test
     public void stateDisplayData() throws Throwable {
-        givenUiStateIs(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
+        givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.VM(defaultData, null));
         listUserRepoRobot.isDisplayDataState();
     }
 
     @Test
     public void stateRefreshing() throws Throwable {
-        givenUiStateIs(refreshingState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
+        givenUiStateIs(SHOW_REFRESHING, new ListUserRepoPresenter.VM(defaultData, null));
         listUserRepoRobot.isRefreshingState();
     }
 
     @Test
     public void stateError() throws Throwable {
-        givenUiStateIs(errorState("Error"));
+        givenUiStateIs(SHOW_ERROR, new ListUserRepoPresenter.VM(Collections.emptyList(),  new NullPointerException("error")));
         listUserRepoRobot.isErrorState();
     }
 
     @Test
     public void stateLoadingWithError() throws Throwable {
-        givenUiStateIs(loadingWithErrorState("Error"));
+        givenUiStateIs(SHOW_LOADING_WITH_ERROR, new ListUserRepoPresenter.VM(defaultData,  new NullPointerException("error")));
         listUserRepoRobot.isLoadingWithErrorState();
     }
 
+
+
     @Test
     public void stateErrorWithData() throws Throwable {
-        givenUiStateIs(errorWithDisplayDataState("Error", Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
+        givenUiStateIs(SHOW_DATA_WITH_ERROR, new ListUserRepoPresenter.VM(defaultData, new NullPointerException("error")));
         listUserRepoRobot.isErrorStateWithData();
     }
 
     @Test
     public void possibleToSwipeWhenStateError() throws Throwable {
-        givenUiStateIs(errorState("Error"));
+        givenUiStateIs(SHOW_ERROR, new ListUserRepoPresenter.VM(new ArrayList<RepoEntity>(), new NullPointerException("error")));
         doAnswer(invocation -> {
-            givenUiStateIs(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
+            givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.VM(defaultData, null));
             return null;
         }).when(presenter).askForRefresh();
 
@@ -110,9 +114,9 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
 
     @Test
     public void possibleToSwipeWhenStateEmpty() throws Throwable {
-        givenUiStateIs(emptyState());
+        givenUiStateIs(SHOW_EMPTY, new ListUserRepoPresenter.VM());
         doAnswer(invocation -> {
-            givenUiStateIs(displayDataState(Collections.singletonList(RepoEntity.create(0, "name", "desc"))));
+            givenUiStateIs(SHOW_DATA, new ListUserRepoPresenter.VM(defaultData, null));
             return null;
         }).when(presenter).askForRefresh();
 
@@ -121,8 +125,8 @@ public class ListUserRepoActivityTest extends BaseActivityTest {
         listUserRepoRobot.isDisplayDataState();
     }
 
-    private void givenUiStateIs(RemoteDataWithRefreshingState state) throws Throwable {
+    private void givenUiStateIs(ListUserRepoPresenter.StateValue state, ListUserRepoPresenter.VM data) throws Throwable {
         uiThreadTestRule.runOnUiThread(() ->
-                ((BaseFragmentWithRemoteDataWithRefreshingState) mActivityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment)).update(state));
+                ((ListUserRepoFragment) mActivityRule.getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment)).notify(state, data));
     }
 }

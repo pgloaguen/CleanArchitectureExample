@@ -5,6 +5,7 @@ import com.pgloaguen.domain.entity.RepoEntity;
 import java.util.List;
 
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
@@ -14,4 +15,5 @@ import io.reactivex.Single;
 public interface GetUserRepoRepository {
     Single<List<RepoEntity>> fetchUserRepo(String user);
     Maybe<List<RepoEntity>> fetchLastUserRepoResult(String user);
+    Observable<List<RepoEntity>> registerRepoUpdated(String user);
 }

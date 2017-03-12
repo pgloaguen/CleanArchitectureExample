@@ -18,7 +18,7 @@ public class MockPresenterModule {
 
     @Provides
     @ActivityScope
-    public ListUserRepoPresenter provideListUserRepoPresenter() {
+    public ListUserRepoPresenter provideListUserRepoPresenter2() {
         return mock(ListUserRepoPresenter.class);
     }
 }

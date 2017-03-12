@@ -15,7 +15,6 @@ import dagger.Provides;
 @Module
 public class PresenterCacheModule {
 
-
     @AppScope
     @Provides
     public PresenterCache<ListUserRepoPresenter> provideListUserRepoPresenterPresenterCache() {
