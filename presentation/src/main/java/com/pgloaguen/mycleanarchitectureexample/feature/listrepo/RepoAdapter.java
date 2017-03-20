@@ -1,7 +1,6 @@
 package com.pgloaguen.mycleanarchitectureexample.feature.listrepo;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.pgloaguen.domain.entity.RepoEntity;
 import com.pgloaguen.mycleanarchitectureexample.R;
 
@@ -18,17 +18,21 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
 
     @NonNull
     private List<RepoEntity> data = new ArrayList<>();
 
-    @Nullable
-    private OnRepoClick listener;
+    @NonNull
+    private final PublishSubject<RepoEntity> favoriteSubject = PublishSubject.create();
+
+    @NonNull
+    private final PublishSubject<RepoEntity> itemClickSubject = PublishSubject.create();
 
     public RepoAdapter() {}
-
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -41,16 +45,8 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         holder.name.setText(repoEntity.name());
         holder.desc.setText(repoEntity.desc());
         holder.favorite.setImageResource(repoEntity.isFavorite() ? R.drawable.ic_favorite_on : R.drawable.ic_favorite_off);
-        holder.itemView.setOnClickListener(__ -> {
-            if(listener != null) {
-                listener.onRepoClick(repoEntity);
-            }
-        });
-        holder.favorite.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onRepoFavorite(repoEntity);
-            }
-        });
+        RxView.clicks(holder.favorite).map(__ -> repoEntity).subscribe(favoriteSubject);
+        RxView.clicks(holder.itemView).map(__ -> repoEntity).subscribe(itemClickSubject);
     }
 
     @Override
@@ -85,8 +81,12 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
         this.data = newData;
     }
 
-    public void setListener(@Nullable OnRepoClick listener) {
-        this.listener = listener;
+    public Observable<RepoEntity> favorite() {
+        return favoriteSubject;
+    }
+
+    public Observable<RepoEntity> itemClick() {
+        return itemClickSubject;
     }
 
     static class VH extends RecyclerView.ViewHolder {
@@ -104,10 +104,5 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.VH> {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
-    }
-
-    public interface OnRepoClick {
-        void onRepoClick(RepoEntity repoEntity);
-        void onRepoFavorite(RepoEntity repoEntity);
     }
 }

@@ -31,6 +31,10 @@ ext {
     rxAndroid           = "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}"
     rxJava              = "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 
+    // RXBinding
+    rxBindingVersion    = '2.0.0'
+    rxBinding           = "com.jakewharton.rxbinding2:rxbinding:${rxBindingVersion}"
+    rxBindingV4         = "com.jakewharton.rxbinding2:rxbinding-support-v4:${rxBindingVersion}"
 
     // OKHTTP
     okHttpVersion       = '3.5.0'

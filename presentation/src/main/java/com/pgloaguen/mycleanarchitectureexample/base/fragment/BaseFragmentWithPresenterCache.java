@@ -15,14 +15,14 @@ public abstract class BaseFragmentWithPresenterCache<P> extends BaseFragment {
 
     private static final String KEY_PRESENTER = "key_presenter";
 
-    private P presenter;
+    private P p;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         if (getActivity().isFinishing() || !isRemoving()) {
-            outState.putString(KEY_PRESENTER, getCache().storePresenter(presenter));
+            outState.putString(KEY_PRESENTER, getCache().storePresenter(p));
         }
     }
 
@@ -31,14 +31,14 @@ public abstract class BaseFragmentWithPresenterCache<P> extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (savedInstanceState != null) {
-            presenter = getCache().getPresenter(savedInstanceState.getString(KEY_PRESENTER, ""));
+            p = getCache().getPresenter(savedInstanceState.getString(KEY_PRESENTER, ""));
         }
 
-        if (presenter == null) {
-            presenter = createPresenter();
+        if (p == null) {
+            p = createPresenter();
         }
 
-        init(presenter);
+        init(p);
     }
 
     @NonNull

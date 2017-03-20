@@ -51,6 +51,8 @@ dependencies {
 
     compile rxJava
     compile rxAndroid
+    compile rxBinding
+    compile rxBindingV4
 
     compile dagger
     apt daggerCompiler
